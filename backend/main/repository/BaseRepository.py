@@ -21,3 +21,17 @@ class BaseRepository(ABC):
             return e
         except Exception:
             return None
+
+    def update(self, _id, **kwargs):
+        m = self.model.objects.filter(pk=_id).first()
+        if m:
+            for field, value in kwargs.items():
+                setattr(m, field, value)
+            m.save()
+        return m
+
+    def delete(self, _id):
+        m = self.model.objects.filter(pk=_id).first()
+        if m:
+            m.delete()
+        return m

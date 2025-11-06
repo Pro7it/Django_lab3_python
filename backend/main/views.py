@@ -1,33 +1,67 @@
 from django.http import HttpResponse
 from .repository.Repository import Repository
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from .serializers import *
 
 # Create your views here.
-def get(request, model_name):
-    mp = Repository()
 
-    if not hasattr(mp, model_name): return HttpResponse(f"Error: repository '{model_name}' not found")
+class BaseViewSet(viewsets.ViewSet):
+    repository = None
+    serializer_class = None
 
-    repository = getattr(mp, model_name)
-    item_id = request.GET.get('id')
+    def list(self, request):
+        objs = self.repository.get_all()
+        serializer = self.serializer_class(objs, many=True)
+        return Response(serializer.data)
 
-    if item_id: return HttpResponse(str(repository.get_by_id(item_id)))
-    else: return HttpResponse(repository.get_all())
+    def retrieve(self, request, pk=None):
+        obj = self.repository.get_by_id(pk)
+        serializer = self.serializer_class(obj)
+        return Response(serializer.data)
 
+    def create(self, request):
+        obj = self.repository.create(request.data)
+        serializer = self.serializer_class(obj)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-# Create your views here.
-def add(request, model_name):
-    mp = Repository()
-    
-    if not hasattr(mp, model_name): return HttpResponse(f"Error: repository '{model_name}' not found")
-    
-    repository = getattr(mp, model_name)
-    
-    try:
-        data = {k: v for k, v in request.GET.items()}
-        return HttpResponse(repository.create(**data))
-        
-    except Exception:
-        return HttpResponse('bad params')
-    
+    def update(self, request, pk=None):
+        obj = self.repository.update(pk, request.data)
+        serializer = self.serializer_class(obj)
+        return Response(serializer.data)
 
+    def destroy(self, request, pk=None):
+        self.repository.delete(pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
+class PlayViewSet(BaseViewSet):
+    repository = Repository().plays
+    serializer_class = PlaySerializer
+
+class ActorViewSet(BaseViewSet):
+    repository = Repository().actors
+    serializer_class = ActorSerializer
+
+class DirectorViewSet(BaseViewSet):
+    repository = Repository().directors
+    serializer_class = DirectorSerializer
+
+class GenreViewSet(BaseViewSet):
+    repository = Repository().genres
+    serializer_class = GenreSerializer
+
+class HallViewSet(BaseViewSet):
+    repository = Repository().halls
+    serializer_class = HallSerializer
+
+class ScheduleViewSet(BaseViewSet):
+    repository = Repository().schedules
+    serializer_class = ScheduleSerializer
+
+class TheatreViewSet(BaseViewSet):
+    repository = Repository().theaters
+    serializer_class = TheatreSerializer
+
+class TicketViewSet(BaseViewSet):
+    repository = Repository().tickets
+    serializer_class = TicketSerializer
