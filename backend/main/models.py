@@ -6,6 +6,7 @@
 #   * Remove lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.contrib.auth.models import AbstractUser 
 
 
 class Actor(models.Model):
@@ -140,3 +141,18 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f'{self.seat}\n'
+
+
+class User(AbstractUser):
+    username = models.CharField(max_length=60, null=False, unique=True)
+    email = models.EmailField(null=False, unique=True)
+        
+    first_name = None
+    last_name = None
+    date_joined = None
+    
+    # по ньому буде йти логін
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    

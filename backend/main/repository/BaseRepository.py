@@ -9,26 +9,22 @@ class BaseRepository(ABC):
         return list(self.model.objects.all())
 
     def get_by_id(self, _id):
-        try:
-            return self.model.objects.get(pk=_id)
-        except Exception:
-            return None
+        return self.model.objects.filter(pk=_id).first()
 
     def create(self, **kwargs):
         try:
             e = self.model(**kwargs)
             e.save()
             return e
-        except Exception:
+        except Exception as e:
+            print("Error:", e)
             return None
 
-    def update(self, _id, **kwargs):
-        m = self.model.objects.filter(pk=_id).first()
-        if m:
-            for field, value in kwargs.items():
-                setattr(m, field, value)
-            m.save()
-        return m
+    def update(self, instance, **kwargs):
+        for field, value in kwargs.items():
+            setattr(instance, field, value)
+        instance.save()
+        return instance
 
     def delete(self, _id):
         m = self.model.objects.filter(pk=_id).first()

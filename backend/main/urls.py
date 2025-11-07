@@ -11,6 +11,7 @@ router.register(r"plays", views.PlayViewSet, basename="play")
 router.register(r"schedules", views.ScheduleViewSet, basename="schedule")
 router.register(r"theaters", views.TheatreViewSet, basename="theatre")
 router.register(r"tickets", views.TicketViewSet, basename="ticket")
+router.register(r"users", views.UserViewSet, basename="users")
 
 urlpatterns = [
     path("api/", include(router.urls)),

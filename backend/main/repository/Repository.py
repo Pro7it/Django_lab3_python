@@ -9,6 +9,7 @@ from .PlayActorRepository import PlayActorRepository
 from .PlayRepository import PlayRepository
 from .GenreRepository import GenreRepository
 from .HallRepository import HallRepository
+from .UserRepository import UserRepository
 
 
 class Repository:
@@ -23,3 +24,4 @@ class Repository:
         self.plays = PlayRepository()
         self.genres = GenreRepository()
         self.halls = HallRepository()
+        self.users = UserRepository()
