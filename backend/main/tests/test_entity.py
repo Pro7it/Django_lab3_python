@@ -63,3 +63,4 @@ class TestEntityData(TestCase):
         result = get_entity_data(1)
 
         self.assertEqual(result, {"error": "Request timed out"})
+        
