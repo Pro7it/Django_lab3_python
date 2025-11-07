@@ -9,7 +9,7 @@ django-admin startproject myproject backend
 winget install --id FiloSottile.age
 також скачати soap звідси https://github.com/getsops/sops/releases/download/v3.11.0/sops-v3.11.0.amd64.exe
 
-
+(всі команди виконувати з lab3_python)
 одноразво
 age-keygen -o sops_key.txt
 
@@ -22,3 +22,43 @@ sops --config .sops.yml --input-type dotenv --output-type dotenv --encrypt backe
 розкодувати
 sops --config .sops.yml --input-type dotenv --output-type dotenv --decrypt backend/.env.enc > backend/.env
 
+
+
+---------------------------------------------------------------------------------------------------------
+
+всі сторінки за посиланням /api стали захищеними (вимагають реєстрації) тому потрібно надіслати post запит на login/ {
+    "email": email,
+    "password": password
+} 
+щоб отримати jwt токен (триває 15хв)
+
+щоб оновити його коли просрочився потрібно надіслати post запит на login/refresh/ {
+    "refresh": refresh_token
+}
+
+для того щоб створити користувача потрібно перейти на /api/users/ (тільки для створеня звичайного користувача, єдина незахищена адерса на api/) де post запитом передати {
+    "password": password,
+    "username": username,
+    "email": email
+} 
+
+
+для доступу до api/:
+    інструмент: 
+        postman: вміє надсилати запити усіх форматів (дуже популярний і зручний)
+    встановлення (Windows): https://www.postman.com/downloads/
+
+    створити команду, колекцію, в ній новий request вставити потрібний url, у вкладці Auth обрати Bearer token та вставити access токен
+    далі можна виконувати запити авторизовано
+
+    також:
+        за посиланням /swagger щоб отримати доступ до захищених посилань потрібно нажати угорі Authorize ввести таке "Bearer access_token" де access_token замінити на свій
+
+
+
+
+що до агрегованого звіту:
+    https://chatgpt.com/s/t_690d3af0c09481919f9eaa7ec27a860c
+    https://chatgpt.com/s/t_690d3b0956b88191955040d309f5ae64
+
+    йдеться про те, що це методи статистики для кожної сутності
