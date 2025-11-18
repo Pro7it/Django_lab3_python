@@ -3,3 +3,5 @@ djangorestframework
 drf-yasg
 dotenv
 djangorestframework-simplejwt
+psycopg2
+django-cors-headers

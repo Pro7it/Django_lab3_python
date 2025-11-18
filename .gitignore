@@ -1,7 +1,6 @@
 .gitignore
 db_lab/
 **/__pycache__
-**/docker-compose.yml
 .idea
 .vscode
 backend/myproject/__pycache__/*
