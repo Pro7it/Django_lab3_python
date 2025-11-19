@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import PlaysPage from "./pages/PlaysPage";
 import ErrorPage from "./pages/ErrorPage";
 import PlayPage from "./pages/PlayPage";
+import { ConfigProvider } from "antd";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,20 @@ const router = createBrowserRouter([
 
 ReactDom.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ConfigProvider
+    theme={{
+      token: {
+        colorLink: "pink",
+        colorText: "#695963"
+      },
+      components: {
+        Skeleton: {
+          paragraphLiHeight: 16,
+          // paragraphMarginTop: 0z  
+        }
+      }
+    }}>
+      <RouterProvider router={router} />
+    </ConfigProvider>
   </React.StrictMode>
 );

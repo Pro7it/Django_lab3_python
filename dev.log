@@ -57,8 +57,7 @@ sops --config .sops.yml --input-type dotenv --output-type dotenv --decrypt backe
 
 
 
-що до агрегованого звіту:
-    https://chatgpt.com/s/t_690d3af0c09481919f9eaa7ec27a860c
-    https://chatgpt.com/s/t_690d3b0956b88191955040d309f5ae64
-
-    йдеться про те, що це методи статистики для кожної сутності
+для нормального зaпуску потрібно запустити (due to replacement of docker-compose.yml)
+docker run --rm -v backend_db_lab:/from -v lab3_python_db_lab:/to alpine sh -c "cp -a /from/. /to/"
+а далі з кореня проекту 
+docker-compose --env-file ./backend/.env up

@@ -1,13 +1,47 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>frontend</title>
+  <style>
+    ::-webkit-scrollbar-button {
+      display: none;
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #ff3bb42e transparent;
+    }
+
+    *::-webkit-scrollbar {
+      display: none;
+
+      width: 16px;
+    }
+
+    *::-webkit-scrollbar-track {
+      display: none;
+
+      background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background-color: transparent;
+      border: 3px solid transparent;
+    }
+    body{
+      background-color: #f1dfd2;
+    }
+  </style>
+</head>
+
+<body style="padding-inline: 8px; margin: 0;">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
