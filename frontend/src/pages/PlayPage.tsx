@@ -1,12 +1,15 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getQuery, putQuery } from "../utils/RestUtils";
+import { deleteQuery, getQuery, putQuery } from "../utils/RestUtils";
 import { type Genre, type Play } from '../utils/DtoUtils';
 import { Button, Input, message, Select, Space, Typography } from "antd";
 import BackButton from "./components/BackButton";
 import { colors } from "../config";
-import { ClockCircleOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, DeleteFilled } from "@ant-design/icons";
+import { changeField } from "../utils/HookFoldUtils";
+import EditableField from "./components/EditableField";
+import type { MessageInstance } from "antd/es/message/interface";
 
 function formatMinutes(minutes: number) {
   const hours = Math.floor(minutes / 60);
@@ -37,12 +40,33 @@ function parseTimeString(str: string) {
   return [hours, minutes];
 }
 
+
+const DeletePlayButton: React.FC<{ id: number, messageApi: MessageInstance }> = ({ id, messageApi }) => {
+  const navigate = useNavigate()
+
+  return <div className="animated-icon"
+    style={{
+      zIndex: 2,
+      position: "absolute",
+      right: "24px",
+      top: "12px",
+      fontSize: "24px",
+      color: colors["accent"] + "66",
+    }}
+    onClick={() => deleteQuery(`api/plays/${id}/`).then(r => { r ? (messageApi.success("deleted!", 1).then(() => navigate(-1))) : messageApi.error("error ocurred", 0.5) })}>
+    <DeleteFilled className="animated-icon-self" style={{ transition: "100ms" }} />
+  </div>
+}
+
+
 const PlayPage: React.FC = () => {
   const params = useParams<{ playid: string }>();
   const [data, setData] = useState<Play | null>(null)
   const [messageApi, contextHolder] = message.useMessage();
   const [genres, setGenres] = useState<Genre[] | null>(null)
   const [isChanged, setChanged] = useState<boolean>(false)
+
+
 
 
   const navigate = useNavigate()
@@ -61,17 +85,6 @@ const PlayPage: React.FC = () => {
     })
   }, [params.playid, navigate])
 
-  const changeField = <T,>(value: T, field: string) => setData(d => {
-    if (d) {
-      const dn: Play = {
-        ...d,
-        [field]: value
-      }
-      setChanged(true)
-      return dn
-    }
-    return d
-  })
 
   const saveFields = () => {
     if (data) {
@@ -79,7 +92,7 @@ const PlayPage: React.FC = () => {
         ...data,
         genre: typeof data.genre === "number" ? data.genre : data.genre.genre_id
       }
-      putQuery(`api/plays/${Data.play_id}/`, Data).then(r => r ? messageApi.success("succesfully saved!") : messageApi.error("error ocurred")).then(() => setChanged(false))
+      putQuery(`api/plays/${Data.play_id}/`, Data).then(r => r ? (setChanged(false), messageApi.success("succesfully saved!", 0.5)) : messageApi.error("error ocurred", 0.5))
     }
   }
 
@@ -94,27 +107,15 @@ const PlayPage: React.FC = () => {
         paddingTop: 0,
         paddingBottom: 24,
         borderRadius: 32,
-        backgroundColor: colors.secondary
+        backgroundColor: colors.secondary,
+        position: "relative",
       }}>
         {data ? <>
-          <Input.TextArea
-            autoSize={{
-              minRows: 1
-            }}
-            value={data.name}
-            onChange={v => changeField(v.currentTarget.value, "name")}
-            variant="borderless"
-            style={{
-              fontSize: 42,
-              marginBlockStart: "0.67em",
-              marginBlockEnd: " 0.67em",
-              marginBottom: "0.5em",
-              color: colors["primary-txt"],
-              fontWeight: 400,
-              lineHeight: 1.1904761904761905,
-              padding: 0
-            }}
-          />
+          <DeletePlayButton id={data.play_id} messageApi={messageApi} />
+          <EditableField size={1} textarea={{
+            value: data.name,
+            onChange: v => (changeField(v.currentTarget.value, "name", setData), setChanged(true))
+          }} />
           <Space direction="vertical" size="middle" style={{ width: "100%" }}>
             <Space size={0} direction="vertical">
               <Space id="author-duration" size="middle">
@@ -129,7 +130,7 @@ const PlayPage: React.FC = () => {
                       minRows: 1
                     }}
                     value={data?.author}
-                    onChange={v => changeField(v.currentTarget.value, "author")}
+                    onChange={v => changeField(v.currentTarget.value, "author", setData)}
                     variant="borderless"
                     style={{
                       width: 120,
@@ -151,7 +152,7 @@ const PlayPage: React.FC = () => {
                       if (time) {
                         const inputEl = v.currentTarget
                         const curpos = inputEl.selectionStart || 0
-                        changeField(time[0] * 60 + time[1], "duration")
+                        changeField(time[0] * 60 + time[1], "duration", setData)
                         setTimeout(() => {
                           inputEl.setSelectionRange(curpos, curpos)
                         }, 0)
@@ -173,8 +174,13 @@ const PlayPage: React.FC = () => {
                   popupMatchSelectWidth={false}
                   options={genres?.map(genre => ({ value: genre.genre_id, label: <Typography>{genre.name}</Typography> }))}
                   value={(typeof data.genre) == "number" ? data.genre : data.genre.genre_id}
-                  onChange={v => changeField(v, "genre")}
-                  variant="borderless"
+                  onChange={v => {
+                    if ((typeof data.genre) == "number") {
+                      changeField(v, "genre", setData)
+                    } else if (genres) {
+                      changeField(genres.filter(g => g.genre_id == v)[0], "genre", setData)
+                    }
+                  }} variant="borderless"
                   style={{
                     width: "fit-content",
                     padding: 0
@@ -185,7 +191,7 @@ const PlayPage: React.FC = () => {
             <Input.TextArea
               autoSize={{ minRows: 1 }}
               value={data.description}
-              onChange={v => changeField(v.currentTarget.value, "description")}
+              onChange={v => changeField(v.currentTarget.value, "description", setData)}
               variant="borderless"
               style={{ padding: 0 }} />
 

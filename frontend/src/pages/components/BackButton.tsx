@@ -12,9 +12,9 @@ const BackButton: React.FC = () => {
             left: "16px",
             top: "16px",
             fontSize: "40px",
-            color: colors.secondary,
+            color: colors["floating-btn"],
         }}
-        onClick={() => navigate(-1)} >
+        onClick={() => (navigate(-1))} >
         <LeftCircleFilled className="animated-icon-self" style={{ transition: "100ms" }} />
     </div>
 }

@@ -1,10 +1,10 @@
-import { Button, Typography } from "antd";
+import { Button, Space, Typography } from "antd";
 import type React from "react";
 
 const HomePage: React.FC = () => {
 
 
-  return <div style={{
+  return <Space direction="vertical" style={{
     width: "100%",
     display: "flex",
     flexDirection: "column",
@@ -16,7 +16,10 @@ const HomePage: React.FC = () => {
     <Button href="plays/" variant="filled" shape="round" color="pink" size="large" >
       plays
     </Button>
-  </div>
+    <Button href="plays/" variant="filled" shape="round" color="pink" size="large" >
+      login
+    </Button>
+  </Space>
 }
 
 export default HomePage 

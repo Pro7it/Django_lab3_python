@@ -9,6 +9,7 @@ import ErrorPage from "./pages/ErrorPage";
 import PlayPage from "./pages/PlayPage";
 import { ConfigProvider } from "antd";
 import { colors } from "./config";
+import PlayCreatePage from './pages/PlayCreatePage';
 
 const router = createBrowserRouter([
   {
@@ -21,35 +22,39 @@ const router = createBrowserRouter([
     element: <PlaysPage />,
   },
   {
+    path: "/plays/create",
+    element: <PlayCreatePage />,
+  },
+  {
     path: "/plays/:playid",
     element: <PlayPage />,
-  },
+  }
 ]);
 
 ReactDom.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ConfigProvider
-    theme={{
-      token: {
-        colorLink: colors.accent,
-        colorText: colors["primary-txt"],
-        fontSize: 16,
-        fontWeightStrong: 400
-      },
-      components: {
-        Skeleton: {
-          paragraphLiHeight: 16,
+      theme={{
+        token: {
+          colorLink: colors.accent,
+          colorText: colors["primary-txt"],
+          fontSize: 16,
+          fontWeightStrong: 400
         },
-        Select: {
+        components: {
+          Skeleton: {
+            paragraphLiHeight: 16,
+          },
+          Select: {
             optionSelectedBg: colors.accent,
             optionActiveBg: colors.accent + "37",
             colorBgElevated: colors.secondary
-        }, 
-        Message: {
-          contentBg: colors.secondary
+          },
+          Message: {
+            contentBg: colors.secondary   
+          }
         }
-      }
-    }}>
+      }}>
       <RouterProvider router={router} />
     </ConfigProvider>
   </React.StrictMode>

@@ -2,28 +2,18 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import type { Play } from "../utils/DtoUtils";
 import { getQuery } from "../utils/RestUtils";
-import { Button, Skeleton, Space, Typography } from "antd";
+import { Skeleton, Space, Typography } from "antd";
 import { colors } from "../config";
 import BackButton from "./components/BackButton";
-
-
-
-const PlayLink: React.FC<{
-  play: Play
-}> = ({ play }) => {
-
-
-  return (<Button href={"/plays/" + play.play_id.toString()} variant="filled" shape="round" color="pink" size="middle">
-    {play.name}
-  </Button>)
-}
+import PlayLink from "./components/PlayLink";
+import CreateButton from "./components/CreateButton";
 
 const PlaysPage: React.FC = () => {
   const [data, setData] = useState<Play[]>([])
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    getQuery("api/plays/").then(e => {
+    getQuery(`api/plays/?_=${Date.now()}`, undefined).then(e => {
       if (e !== null) {
         setData((e as Play[]).sort((a, b) => a.play_id - b.play_id))
         setLoading(false)
@@ -40,6 +30,7 @@ const PlaysPage: React.FC = () => {
       position: "relative",
     }}>
     <BackButton />
+    <CreateButton />
     <Typography.Title level={1}>
       All plays ever
     </Typography.Title>
@@ -70,11 +61,3 @@ const PlaysPage: React.FC = () => {
 
 
 export default PlaysPage
-
-// (<pre
-//         style={{
-//           display: "inline-block",
-//           maxWidth: "100%",
-//           whiteSpace: "pre-wrap",
-//           wordBreak: "break-word"
-//         }} key={play.play_id}>{JSON.stringify(play, null, 3)}</pre>)
