@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
 
-
 class BaseViewSet(viewsets.ViewSet):
     repository = None
     serializer_class = None
@@ -27,25 +26,18 @@ class BaseViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            validated_data = serializer.validated_data
-            obj = self.repository.create(**validated_data)
-            print(validated_data)
-            if obj is None:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            obj = serializer.save()
             response_serializer = self.serializer_class(obj)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
         instance = self.repository.get_by_id(pk)
-        if instance is None:
-            return None
+        if instance is None: return Response({"detail": f"Object with id={pk} not found"}, status=404)
 
         serializer = self.serializer_class(instance, data=request.data, partial=False)
         if serializer.is_valid():
-            validated_data = serializer.validated_data
-            instance = self.repository.update(instance, **validated_data)
+            instance = serializer.save()
             response_serializer = self.serializer_class(instance)
             return Response(response_serializer.data)
 
