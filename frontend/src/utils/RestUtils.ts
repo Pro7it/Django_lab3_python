@@ -1,5 +1,4 @@
 import { Varialbles } from "../config";
-import { getAccessToken } from "../pages/LoginPage";
 
 const errorHandle = (e: string | object) => {
     if (Varialbles.devMode) {
