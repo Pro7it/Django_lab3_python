@@ -46,21 +46,6 @@ class Genre(models.Model):
     def __str__(self):
         return f'{self.name}: {self.description}\n'
 
-
-class Hall(models.Model):
-    hall_id = models.AutoField(primary_key=True)
-    theatre = models.ForeignKey('Theatre', models.CASCADE)
-    name = models.CharField(max_length=50)
-    capacity = models.IntegerField()
-
-    class Meta:
-        db_table = 'Hall'
-        unique_together = (('theatre', 'name'),)
-
-    def __str__(self):
-        return f'{self.name} ({self.capacity}) - {self.theatre}\n'
-
-
 class Play(models.Model):
     play_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
@@ -76,6 +61,21 @@ class Play(models.Model):
 
     def __str__(self):
         return f'{self.name}, {self.author} - {self.description}\n'
+
+class Hall(models.Model):
+    hall_id = models.AutoField(primary_key=True)
+    theatre = models.ForeignKey('Theatre', models.CASCADE)
+    name = models.CharField(max_length=50)
+    capacity = models.IntegerField()
+
+    class Meta:
+        db_table = 'Hall'
+        unique_together = (('theatre', 'name'),)
+
+    def __str__(self):
+        return f'{self.name} ({self.capacity}) - {self.theatre}\n'
+
+
 
 
 class PlayActor(models.Model):

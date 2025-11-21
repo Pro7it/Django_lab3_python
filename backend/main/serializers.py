@@ -6,16 +6,6 @@ class ActorSerializer(serializers.ModelSerializer):
         model = Actor
         fields = '__all__'
 
-
-class PlaySerializer(serializers.ModelSerializer):
-    actors = serializers.StringRelatedField(many=True)
-    directors = serializers.StringRelatedField(many=True)
-
-    class Meta:
-        model = Play
-        fields = '__all__'
-
-
 class DirectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Director
@@ -26,6 +16,57 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = '__all__'
+
+class PlaySerializer(serializers.ModelSerializer):
+    # actors = serializers.PrimaryKeyRelatedField(queryset=Actor.objects.all(), many=True)
+    # directors = serializers.PrimaryKeyRelatedField(queryset=Director.objects.all(), many=True)
+    directors = DirectorSerializer(many=True, read_only=True)
+    actors = ActorSerializer(many=True, read_only=True)
+    genre = GenreSerializer(read_only=True)
+
+    director_ids = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Director.objects.all(), write_only=True
+    )
+    actor_ids = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Actor.objects.all(), write_only=True
+    )
+    genre_id = serializers.PrimaryKeyRelatedField(
+        queryset=Genre.objects.all(), write_only=True
+    )
+
+    class Meta:
+        model = Play
+        fields = '__all__'
+
+    def create(self, validated_data):
+        actor_ids = validated_data.pop('actor_ids', [])
+        director_ids = validated_data.pop('director_ids', [])
+        genre_instance = validated_data.pop('genre_id', None)
+
+        play = Play.objects.create(genre=genre_instance, **validated_data)
+        play.actors.set(actor_ids)
+        play.directors.set(director_ids)
+        return play
+
+    def update(self, instance, validated_data):
+        
+        actor_ids = validated_data.pop('actor_ids', None)
+        director_ids = validated_data.pop('director_ids', None)
+        genre_instance = validated_data.pop('genre_id', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if genre_instance: 
+            instance._state.fields_cache.pop('genre', None)
+            instance.genre = genre_instance
+
+        instance.save()
+
+        if actor_ids is not None: instance.actors.set(actor_ids)
+        if director_ids is not None: instance.directors.set(director_ids)
+
+        return instance
 
 
 class HallSerializer(serializers.ModelSerializer):

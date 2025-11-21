@@ -30,7 +30,10 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+CORS_ALLOWED_ORIGINS = [host.strip() for host in CORS_ALLOWED_ORIGINS]
 
 # Application definition
 
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     # наші додатки
     "main",
     # бібліотеки
+    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_yasg",
@@ -52,6 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -156,23 +161,13 @@ SIMPLE_JWT.update(
 
 REST_FRAMEWORK = {
     # головний спосіб аутинфікації
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
     # За замовчуванням користувач має бути авторизований
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
 
 SWAGGER_SETTINGS = {
     # налаштування що дозволяють свагеру додати потрібний заголовок
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
-    },
-    'USE_SESSION_AUTH': False, 
+    "SECURITY_DEFINITIONS": {"Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}},
+    "USE_SESSION_AUTH": False,
 }

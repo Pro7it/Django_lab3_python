@@ -1,0 +1,62 @@
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ff3bb42e transparent;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+
+  width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+  display: none;
+
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: transparent;
+  border: 3px solid transparent;
+}
+body {
+  background-color: #f1dfd2;
+}
+
+#root, body {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100dvw;
+  height: 100dvh;
+}
+
+.animated-icon:hover .animated-icon-self{
+    color: #594545;
+    scale: 1.1;
+}
+
+.animated-icon:active .animated-icon-self{
+    color: #594545;
+    scale: 1.2;
+}
+
+.input-number-edit, .input-number-edit>div{
+  width: fit-content;
+  padding: 0;
+}
+
+.input-number-edit>div>input{
+  padding: 0 !important;
+  width: 32px !important;
+  padding: 4px !important;
+}
+
+.select-edit .ant-select-selection-item{
+  padding-inline-end: 0px !important;
+  /* padding-inline: 4px !important; */
+}
