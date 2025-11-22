@@ -18,6 +18,8 @@ const PlayCreatePage: React.FC = () => {
     const [genres, setGenres] = useState<Genre[]>([])
     const navigate = useNavigate()
 
+    const except = ["actors", "directors", "play_id"]
+
     const handleCreate = () => {
         if (data) {
             const Data = {
@@ -27,7 +29,7 @@ const PlayCreatePage: React.FC = () => {
                 director_ids: data.directors,
 
             }
-            if (checkAllFilled(data, EmptyPlay)) {
+            if (checkAllFilled(data, EmptyPlay, except)) {
                 postQuery(`api/plays/`, Data).then(r => r ? (setData(EmptyPlay), messageApi.success("succesfully saved!", 0.5)) : messageApi.error("error ocurred", 0.5))
             }
         }
@@ -106,7 +108,7 @@ const PlayCreatePage: React.FC = () => {
                     }} />
 
                 </Space>
-                {checkAllFilled(data, EmptyPlay) && <Space style={{ width: "100%", justifyContent: "center", marginTop: 32 }}>
+                {checkAllFilled(data, EmptyPlay, except) && <Space style={{ width: "100%", justifyContent: "center", marginTop: 32 }}>
                     <Button color="pink" variant="solid" shape="round" onClick={handleCreate} children="Зберегти" />
                 </Space>}
             </Container>
