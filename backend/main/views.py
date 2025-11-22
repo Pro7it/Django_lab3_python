@@ -5,11 +5,13 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 class BaseViewSet(viewsets.ViewSet):
     repository = None
     serializer_class = None
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def list(self, _):
         objs = self.repository.get_all()
@@ -33,7 +35,8 @@ class BaseViewSet(viewsets.ViewSet):
 
     def update(self, request, pk=None):
         instance = self.repository.get_by_id(pk)
-        if instance is None: return Response({"detail": f"Object with id={pk} not found"}, status=404)
+        if instance is None:
+            return Response({"detail": f"Object with id={pk} not found"}, status=404)
 
         serializer = self.serializer_class(instance, data=request.data, partial=False)
         if serializer.is_valid():
@@ -124,10 +127,10 @@ class ScheduleViewSet(BaseViewSet):
     @swagger_auto_schema(request_body=serializer_class)
     def update(self, request, pk=None):
         return super().update(request, pk)
-    
-    @action(detail=False, methods=['get'], url_path='stats')
+
+    @action(detail=False, methods=["get"], url_path="stats")
     def stats(self, _):
-        report = self.repository.get_stats()  
+        report = self.repository.get_stats()
         return Response(report)
 
 
@@ -177,9 +180,33 @@ class UserViewSet(BaseViewSet):
     @swagger_auto_schema(request_body=serializer_class)
     def create(self, request):
         self.get_serializer_class()
-        return super().create(request)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            obj = self.repository.create(**validated_data)
+            if obj is None:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            response_serializer = self.serializer_class(obj)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(request_body=serializer_class)
     def update(self, request, pk=None):
         self.get_serializer_class()
-        return super().update(request, pk)
+        instance = self.repository.get_by_id(pk)
+        if instance is None:
+            return Response(f"there is no object with id = {pk}", status=404)
+
+        serializer = self.serializer_class(instance, data=request.data, partial=False)
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            instance = self.repository.update(instance, **validated_data)
+            response_serializer = self.serializer_class(instance)
+            return Response(response_serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer

@@ -33,3 +33,14 @@ export interface UserLogin {
   email: string,
   password: string
 }
+
+export const EmptyPlay: Play = {
+    name: "",
+    actors: [],
+    directors: [],
+    author: "",
+    description: "",
+    duration: 0,
+    genre: 0,
+    play_id: 0
+}

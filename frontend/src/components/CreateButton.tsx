@@ -1,5 +1,5 @@
 import { PlusCircleFilled } from "@ant-design/icons"
-import { colors } from "../../config"
+import { colors } from "../config"
 import { useNavigate } from "react-router-dom"
 
 const CreateButton: React.FC = () => {

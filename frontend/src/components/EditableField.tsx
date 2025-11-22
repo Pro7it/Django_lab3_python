@@ -1,5 +1,5 @@
 import type React from "react"
-import { colors } from "../../config"
+import { colors } from "../config"
 import type { TextAreaProps } from "antd/es/input"
 import Input from "antd/es/input"
 

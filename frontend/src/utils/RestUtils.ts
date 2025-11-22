@@ -1,4 +1,6 @@
 import { Varialbles } from "../config";
+import { useToken } from "./StateManager";
+
 
 const errorHandle = (e: string | object) => {
     if (Varialbles.devMode) {
@@ -10,14 +12,22 @@ const errorHandle = (e: string | object) => {
 const queryMeta: RequestInit = {
     headers: {
         "Content-Type": "application/json",
-        // "Authorization": `Bearer ${getAccessToken()}`,
+        ...(useToken.getState().token != "" ? { "Authorization": `Bearer ${useToken.getState().token}` } : {}),
     },
     credentials: Varialbles.cookies ? "include" : undefined
 }
 
 const handleAuth = (data: Response) => {
-    if(data.status == 401){
-        // location.assign("/login")
+    const errorAuth = (r: { error?: string[] }) => {
+        if (r.error && r.error[0] == "WrongData") {
+            return null
+        } else {
+            location.assign("/login")
+        }
+    }
+
+    if (data.status == 401) {
+        data.text().then(r => JSON.parse(r)).then(r => errorAuth(r))
     }
     return Promise.resolve((null))
 }

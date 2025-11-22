@@ -1,5 +1,5 @@
 import { Button } from "antd"
-import type { Play } from "../../utils/DtoUtils"
+import type { Play } from "../utils/ApiDtos"
 
 const PlayLink: React.FC<{
   play: Play

@@ -1,15 +1,18 @@
 import { Button, Space, Typography } from "antd";
-import BackButton from "./components/BackButton";
+import { FloatingButton } from "../components/FloatingButton";
 import { useState } from "react";
 import error_img from "../../assets/zahar.jpg"
 import { colors } from "../config";
+import { HomeFilled } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 function ErrorPage() {
   const [isOpened, setOpened] = useState<boolean>(false)
+  const navigate = useNavigate()
 
 
   return <Space direction="vertical" wrap style={{ width: "100dvw", height: "100dvh", justifyContent: "center", alignContent: "center", alignItems: "center", columnGap: 0 }}>
-    <BackButton href={"/"}  />
+    <FloatingButton Icon={HomeFilled} onClick={() => navigate("/")} />
     {!isOpened && <>
       <Typography.Title level={1}>It is an error page</Typography.Title>
       <Typography.Title level={1}>You'll regret coming here😈</Typography.Title>
