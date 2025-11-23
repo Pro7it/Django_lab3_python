@@ -208,7 +208,7 @@ const PlayPage: React.FC = () => {
             }} />
 
             {data != null && lastSavedData != null && !checkSame(data, lastSavedData) && <Space ref={buttonRef} style={{ width: "100%", justifyContent: "center" }}>
-              <Button color="pink" variant="solid" shape="round" onClick={handleSave}>
+              <Button className="fade-apear" color="pink" variant="solid" shape="round" onClick={handleSave}>
                 Зберегти
               </Button>
             </Space>}
