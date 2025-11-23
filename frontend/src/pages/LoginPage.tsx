@@ -1,14 +1,18 @@
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { postQuery } from "../utils/RestUtils";
 import { type UserLogin } from '../utils/ApiDtos';
 import { Button, Input, message, Space, Typography } from "antd";
 import { FloatingButton } from "../components/FloatingButton";
-import { Container } from "../components/Containers";
+import { Container, ContainerStyles } from "../components/Containers";
 import { changeField, checkAllFilled } from "../utils/HookFolders";
 import { useNavigate } from "react-router-dom";
 import { useToken } from "../utils/StateManager";
 import { LeftCircleFilled } from "@ant-design/icons";
+import Icon from "../components/Icon";
+import { arrow1_1, arrow1_2 } from "../utils/IconPaths";
+import { colors } from "../config";
+import { createDraggable, createScope, Scope, spring } from "animejs";
 
 
 const EmptyUserLogin: UserLogin = {
@@ -23,7 +27,8 @@ const LoginPage: React.FC = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const setToken = useToken(s => s.setToken)
     const navigate = useNavigate()
-    
+    const scope = useRef<Scope>(null)
+    const refScope = useRef<HTMLDivElement>(null)
 
     const loginMe = (e: React.FormEvent<HTMLFormElement>) => {
         setloading(true)
@@ -41,11 +46,57 @@ const LoginPage: React.FC = () => {
 
     }
 
-    return <>
+    useEffect(() => {
+        scope.current = createScope({ root: refScope }).add(() => {
+            createDraggable('.arrow-message', {
+                container: [0.9, 0, 0, 0],
+                releaseEase: spring({ bounce: .1 })
+            });
+
+        })
+
+        return () => scope.current?.revert()
+    }, [])
+
+    return <div ref={refScope} id="outer-scope" style={ContainerStyles.containerSize.fullsize}>
         {contextHolder}
         <FloatingButton Icon={LeftCircleFilled} onClick={() => navigate("/")} />
+
         <Container containerSize="fullsize" template="outer" >
-            <Container containerSize="compact" template="inner" props={{ style: { paddingTop: 0 } }} >
+            <Container containerSize="compact" template="inner" props={{ style: { paddingTop: 0, position: "relative" } }} >
+                <div className="arrow-message" style={{ position: "absolute", right: "-30px", top: "210px" }}>
+                    <div style={{ position: "relative" }}>
+                        <div style={{ position: "absolute", right: 0, bottom: "0px", rotate: "20deg" }}>
+                            <Icon
+                                path={<g>
+                                    <path
+                                        d={arrow1_1}
+                                        strokeWidth={5}
+                                        stroke="currentColor"
+                                        className="arrow1" />
+                                    <path
+                                        d={arrow1_2}
+                                        strokeWidth={5}
+                                        stroke="currentColor"
+                                        className="arrow2" />
+                                </g>}
+                                style={{
+                                    width: 80,
+                                    color: colors.arrow,
+                                }}
+                                props={{
+                                    fill: "none",
+                                    viewBox: "0 0 100 100"
+                                }}
+                            />
+                        </div>
+                        <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -30, bottom: 50, padding: 16, minWidth: 120, rotate: "10deg" } }}>
+                            <Typography style={{color: colors.primary}}>
+                                Спробуй ввести пошту та пороль) ✨ 🔑
+                            </Typography>
+                        </Container>
+                    </div>
+                </div>
                 {data ? <form onSubmit={loginMe} >
                     <Typography.Title style={{ width: "100%" }}>
                         Вхід
@@ -88,7 +139,7 @@ const LoginPage: React.FC = () => {
                 </form> : null}
             </Container>
         </Container>
-    </>
+    </div>
 }
 
 export default LoginPage

@@ -4,7 +4,7 @@ import { Space, type SpaceProps } from "antd"
 import { colors } from "../config"
 
 
-const CardStyles: {
+export const ContainerStyles: {
     template: {
         outer: React.CSSProperties,
         inner: React.CSSProperties,
@@ -64,8 +64,8 @@ export const Container: React.FC<PropsWithChildren<CardContainerProps>> = ({
         {...props}
 
         style={{
-            ...CardStyles.template[template],
-            ...CardStyles.containerSize[containerSize],
+            ...ContainerStyles.template[template],
+            ...ContainerStyles.containerSize[containerSize],
             ...props?.style,
         }}>
         {children}

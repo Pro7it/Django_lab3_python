@@ -24,6 +24,7 @@
   background-color: transparent;
   border: 3px solid transparent;
 }
+
 body {
   background-color: #f1dfd2;
   padding: 0 !important;
@@ -41,40 +42,60 @@ body {
   padding-inline: 0 !important;
 }
 
-.animated-icon:hover .animated-icon-self{
-    color: #594545;
-    scale: 1.1;
+.animated-icon:hover .animated-icon-self {
+  color: #594545;
+  scale: 1.1;
 }
 
-.animated-icon:active .animated-icon-self{
-    color: #594545;
-    scale: 1.2;
+.animated-icon:active .animated-icon-self {
+  color: #594545;
+  scale: 1.2;
 }
 
-.input-number-edit, .input-number-edit>div{
+.input-number-edit,
+.input-number-edit>div {
   width: fit-content;
   padding: 0;
 }
 
-.input-number-edit>div>input{
+.input-number-edit>div>input {
   padding: 0 !important;
   width: 32px !important;
   padding: 4px !important;
 }
 
-.select-edit .ant-select-selection-item{
+.select-edit .ant-select-selection-item {
   padding-inline-end: 0px !important;
   /* padding-inline: 4px !important; */
 }
 
-/*
-Source - https://stackoverflow.com/a
-Posted by Fareed Alnamrouti, modified by community. See post 'Timeline' for change history
-Retrieved 2025-11-22, License - CC BY-SA 4.0
-*/
-
 input:-webkit-autofill {
-    -webkit-background-clip: text;
-    transition: background-color 5000s ease-in-out 0s;
-    box-shadow: inset 0 0 20px 20px #5d5a5a00;
+  -webkit-background-clip: text;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px #5d5a5a00;
+}
+
+
+.arrow1 {
+  /* stroke-dasharray: 100;
+  stroke-dashoffset: 700; */
+  animation: draw 5900ms 500ms linear alternate forwards;
+}
+
+.arrow2 {
+  /* stroke-dasharray: 100;
+  stroke-dashoffset: 700; */
+  animation: draw 3300ms 900ms linear alternate forwards;
+}
+
+.arrow1,
+.arrow2 {
+  stroke-dasharray: 1300px;
+  stroke-dashoffset: 1300px;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
