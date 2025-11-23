@@ -15,6 +15,7 @@ export const str2duration = (str: string) => {
     hours = 0
   if (minutes > 59)
     minutes = 59
-
+  if(hours > 9)
+    hours = 9
   return hours * 60 + minutes;
 }

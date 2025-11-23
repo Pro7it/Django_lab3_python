@@ -99,3 +99,14 @@ input:-webkit-autofill {
     stroke-dashoffset: 0;
   }
 }
+
+.fade-apear{
+  opacity: 0;
+  animation: fade-apear 1650ms linear alternate forwards;
+}
+
+@keyframes fade-apear {
+  to{
+    opacity: 1;
+  }
+}

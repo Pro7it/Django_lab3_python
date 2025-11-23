@@ -2,7 +2,7 @@ import type React from "react"
 import type { PropsWithChildren } from "react"
 import { Space, type SpaceProps } from "antd"
 import { colors } from "../config"
-
+import type * as CSS from 'csstype';
 
 export const ContainerStyles: {
     template: {
@@ -14,13 +14,14 @@ export const ContainerStyles: {
         fullsize: React.CSSProperties,
         fullwindow: React.CSSProperties,
     },
+    div: {
+        default: React.CSSProperties,
+    }
 } = {
     template: {
         outer: {
             columnGap: 0,
             justifyContent: "center",
-            // alignContent: "center",
-            // justifyItems: "center",
             alignItems: "center",
             backgroundColor: colors.primary,
         },
@@ -33,7 +34,6 @@ export const ContainerStyles: {
     containerSize: {
         compact: {
             width: "fit-content",
-            // height: "100%",
         },
         fullsize: {
             width: "100%",
@@ -44,23 +44,34 @@ export const ContainerStyles: {
             height: "100%",
         },
     },
+    div: {
+        default: {
+            display: "inline-flex",
+        }
+    }
 }
 
-export interface CardContainerProps {
-    containerSize?: "compact" | "fullsize" | "fullwindow",
+export interface CardContainerProps<T extends "div" | "space"> {
+    containerSize?: "compact" | "fullsize" | "fullwindow"
     template?: "outer" | "inner"
-    props?: SpaceProps
+    direction?: "vertical" | "horizontal",
+    renderItem?: T
+    props?: T extends "space" ? SpaceProps : React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
 }
 
-export const Container: React.FC<PropsWithChildren<CardContainerProps>> = ({
-    containerSize = "compact",
-    template = "outer",
-    props,
-    children
-}) => {
-    return <Space
+export const Container = <T extends "space" | "div">(
+    {
+        containerSize = "compact",
+        template = "outer",
+        props,
+        children,
+        renderItem = "space" as T,
+        direction = "vertical"
+    }: PropsWithChildren<CardContainerProps<T>>
+) => {
+    return renderItem ? <Space
         size={0}
-        direction="vertical"
+        direction={direction}
         {...props}
 
         style={{
@@ -69,5 +80,13 @@ export const Container: React.FC<PropsWithChildren<CardContainerProps>> = ({
             ...props?.style,
         }}>
         {children}
-    </Space>
+    </Space> : <div {...props} style={{
+        flexDirection: direction as CSS.Property.FlexDirection,
+        ...ContainerStyles.template[template],
+        ...ContainerStyles.containerSize[containerSize],
+        ...ContainerStyles.div.default,
+        ...props?.style,
+    }}>
+
+    </div>
 }

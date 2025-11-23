@@ -24,9 +24,10 @@ const EditableStyles: {
     },
     fixed: {
         width: 120,
+        lineHeight: 1
     },
     regular: {
-
+        lineHeight: 1
     }
 }
 

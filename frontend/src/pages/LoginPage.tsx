@@ -5,7 +5,6 @@ import { type UserLogin } from '../utils/ApiDtos';
 import { Button, Input, message, Space, Typography } from "antd";
 import { FloatingButton } from "../components/FloatingButton";
 import { Container, ContainerStyles } from "../components/Containers";
-import { changeField, checkAllFilled } from "../utils/HookFolders";
 import { useNavigate } from "react-router-dom";
 import { useToken } from "../utils/StateManager";
 import { LeftCircleFilled } from "@ant-design/icons";
@@ -13,11 +12,35 @@ import Icon from "../components/Icon";
 import { arrow1_1, arrow1_2 } from "../utils/IconPaths";
 import { colors } from "../config";
 import { createDraggable, createScope, Scope, spring } from "animejs";
+import { gsap } from "gsap";
+import { Flip } from "gsap/Flip";
+import { changeField, checkAllFilled } from "../utils/HookFolders";
+
+gsap.registerPlugin(Flip)
 
 
 const EmptyUserLogin: UserLogin = {
     email: "",
     password: ""
+}
+
+export const SmoothButton = (containerRef: React.RefObject<HTMLDivElement | null>, buttonRef: React.RefObject<HTMLDivElement | null>, checkFn: () => boolean) => {
+    if (!containerRef.current || !buttonRef.current) return;
+
+    const state = Flip.getState(containerRef.current.querySelectorAll("*"));
+
+
+    Flip.from(state, { duration: .2, ease: "power1.inOut", nested: true, fade: true });
+    gsap.killTweensOf(buttonRef.current)
+    if (checkFn()) {
+        let tl = gsap.timeline();
+        tl.to(buttonRef.current, { display: "flex", duration: 0.3 });
+        tl.to(buttonRef.current, { opacity: 1, duration: 0.1 })
+    } else {
+        let tl = gsap.timeline();
+        tl.to(buttonRef.current, { opacity: 0, duration: 0.2 })
+        tl.to(buttonRef.current, { display: "none", duration: 0.3 });
+    }
 }
 
 
@@ -29,6 +52,9 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate()
     const scope = useRef<Scope>(null)
     const refScope = useRef<HTMLDivElement>(null)
+    const containerRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLDivElement>(null);
+
 
     const loginMe = (e: React.FormEvent<HTMLFormElement>) => {
         setloading(true)
@@ -50,7 +76,8 @@ const LoginPage: React.FC = () => {
         scope.current = createScope({ root: refScope }).add(() => {
             createDraggable('.arrow-message', {
                 container: [0.9, 0, 0, 0],
-                releaseEase: spring({ bounce: .1 })
+                releaseEase: spring({ bounce: .1 }),
+                containerFriction: 0.8
             });
 
         })
@@ -58,11 +85,15 @@ const LoginPage: React.FC = () => {
         return () => scope.current?.revert()
     }, [])
 
-    return <div ref={refScope} id="outer-scope" style={ContainerStyles.containerSize.fullsize}>
+
+    useEffect(() => SmoothButton(containerRef, buttonRef, () => (data.email.trim() != "" && data.password !== "")), [data]);
+
+
+    return <div style={ContainerStyles.containerSize.fullsize}>
         {contextHolder}
         <FloatingButton Icon={LeftCircleFilled} onClick={() => navigate("/")} />
 
-        <Container containerSize="fullsize" template="outer" >
+        <Container renderItem="div" props={{ style: { overflow: "hidden" }, ref: refScope }} containerSize="fullsize" template="outer" >
             <Container containerSize="compact" template="inner" props={{ style: { paddingTop: 0, position: "relative" } }} >
                 <div className="arrow-message" style={{ position: "absolute", right: "-30px", top: "210px" }}>
                     <div style={{ position: "relative" }}>
@@ -91,7 +122,7 @@ const LoginPage: React.FC = () => {
                             />
                         </div>
                         <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -30, bottom: 50, padding: 16, minWidth: 120, rotate: "10deg" } }}>
-                            <Typography style={{color: colors.primary}}>
+                            <Typography style={{ color: colors.primary }}>
                                 Спробуй ввести пошту та пороль) ✨ 🔑
                             </Typography>
                         </Container>
@@ -101,8 +132,8 @@ const LoginPage: React.FC = () => {
                     <Typography.Title style={{ width: "100%" }}>
                         Вхід
                     </Typography.Title>
-                    <Space direction="vertical" size={0} >
-                        <Space direction="vertical" size="small" >
+                    <Space direction="vertical" size={0}  >
+                        <Space direction="vertical" size="small" ref={containerRef}     >
                             <Input
                                 type="text"
                                 name="username"
@@ -128,12 +159,14 @@ const LoginPage: React.FC = () => {
                                     padding: 0,
                                 }}
                             />
+                            <Space ref={buttonRef} style={{ width: "100%", justifyContent: "center", display: "none" }}>
+                                <Button loading={loading} disabled={loading} style={{
+                                    marginTop: 16,
+                                }} htmlType="submit" color="pink" variant="solid" shape="round">
+                                    Увійти
+                                </Button>
+                            </Space>
                         </Space>
-                        {checkAllFilled(data, EmptyUserLogin) && <Space style={{ width: "100%", justifyContent: "center", marginTop: 32 }}>
-                            <Button loading={loading} disabled={loading} htmlType="submit" color="pink" variant="solid" shape="round">
-                                Увійти
-                            </Button>
-                        </Space>}
                     </Space>
 
                 </form> : null}
