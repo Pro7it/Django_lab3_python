@@ -13,22 +13,27 @@ import { Container } from "../components/Containers";
 import { useMessage } from "../utils/StateManager";
 import { duration2str } from "../utils/DurationUtils";
 import Icon from "../components/Icon";
-import { arrow1_1, arrow1_2 } from "../utils/IconPaths";
+import { arrow1_1, arrow1_2, arrow2_1, arrow2_2, arrow3_1, arrow3_2 } from "../utils/IconPaths";
 import { createDraggable, createScope, spring, Scope } from "animejs";
 import { FloatingContainer } from "../components/FloatingContainer";
 
 const PlayPage: React.FC = () => {
   const params = useParams<{ playid: string }>();
   const [data, setData] = useState<Play | null>(null)
+  const [boolData, setBoolData] = useState<boolObj<Play>>({})
   const [lastSavedData, setLastSavedData] = useState<Play | null>(null)
   const messageApi = useMessage(s => s.messageApi)
   const [genres, setGenres] = useState<Genre[] | null>(null)
   const navigate = useNavigate()
   const scope = useRef<Scope>(null)
   const refScope = useRef<HTMLDivElement>(null)
-  const refNote = useRef<HTMLDivElement>(null)
+  const refNote1 = useRef<HTMLDivElement>(null)
+  const refNote2 = useRef<HTMLDivElement>(null)
+  const refNote3 = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const [correctnessWarningTxt, setCorrectnessWarningTxt] = useState<string>("");
 
   const handleDelete = (id: number) => deleteQuery(`api/plays/${id}/`).then(r => r ? (messageApi?.success("deleted!", 1).then(() => navigate(-1)), null) : messageApi?.error("error ocurred", 0.5))
 
@@ -45,12 +50,43 @@ const PlayPage: React.FC = () => {
     }
   }
 
+  type boolObj<T,> = {
+    [K in keyof T]?: boolean;
+  };
+
+  const checkForCorectness = (data?: Play): boolObj<Play> => {
+    if (!data) return {};
+
+    return {
+      name: data.name.trim() !== "",
+      author: data.author.trim() !== "",
+      description: data.description.trim() !== "",
+      genre: data.genre != 0,
+      duration: data.duration > 0,
+    }
+
+  }
+
+  const getTextForCorrectnessWarning = (data?: Play) => {
+    if (!data) return "";
+    //TODO думаю залишу це на Олену, якщо вона захоче
+    return "TODO"
+  }
+
+  const checkIfAllCorrect = (data: Play, lastSavedData: Play, boolData: boolObj<Play>) => {
+    if (checkSame(data, lastSavedData)) return false;
+    if (!Object.keys(boolData).every(k => boolData[k as keyof boolObj<Play>])) return false;
+
+    return true
+  }
+
 
   useEffect(() => {
     getQuery(`api/plays/${params.playid}`).then(e => {
       if (e) {
         setData(e as Play)
         setLastSavedData(e as Play)
+        setBoolData(checkForCorectness(e as Play))
       } else {
         navigate("/error")
       }
@@ -64,18 +100,31 @@ const PlayPage: React.FC = () => {
 
 
   useEffect(() => {
-    const note = refNote.current
-    if (!note) return;
+    if (data) {
+      setBoolData(checkForCorectness(data))
+      setCorrectnessWarningTxt(getTextForCorrectnessWarning(data))
+    }
+  }, [data])
+
+
+  useEffect(() => {
+    const note = [refNote1.current, refNote2.current, refNote3.current]
+
     scope.current = createScope({ root: refScope }).add(() => {
-      createDraggable(note, {
-        container: [0.9, 0, 0, 0],
-        releaseEase: spring({ bounce: .1 }),
-        containerFriction: 0.8
-      });
+      note.forEach(note => {
+
+        if (!note) return;
+        createDraggable(note, {
+          container: [0.9, 0, 0, 0],
+          releaseEase: spring({ bounce: .1 }),
+          containerFriction: 0.8
+        });
+      })
     })
 
     return () => scope.current?.revert()
-  }, [NodeIterator, data?.duration])
+
+  }, [data, boolData])
 
   // useEffect(() => SmoothButton(containerRef, buttonRef, () => (data != null && lastSavedData != null && !checkSame(data, lastSavedData))), [data])
 
@@ -83,22 +132,32 @@ const PlayPage: React.FC = () => {
     <FloatingButton Icon={LeftCircleFilled} onClick={() => navigate(-1)} />
     <Container renderItem="div" props={{ ref: refScope, style: { overflow: "hidden" } }} template="outer" containerSize="fullsize">
       <Container template="inner" containerSize="compact" props={{ style: { paddingTop: 16, position: "relative" } }}>
-        {data?.duration == 0 && <div className="arrow-message fade-apear" ref={refNote} style={{ position: "absolute", right: 0, top: "210px" }}>
+
+
+        {data && (!boolData.name || !boolData.genre || !boolData.description) && <div className="arrow-message fade-apear" ref={refNote3} style={{ position: "absolute", left: 250, top: 0, zIndex: 3 }}>
           <div style={{ position: "relative" }}>
-
-
-            <div style={{ position: "absolute", right: 0, bottom: "0px", rotate: "20deg" }}>
+            <div style={{ position: "absolute", right: 0, bottom: "0px", rotate: "25deg" }}>
               <Icon
                 path={<g>
                   <path
-                    d={arrow1_1}
+                    d={arrow3_1}
                     strokeWidth={5}
                     stroke="currentColor"
+                    style={{
+                      strokeWidth: "32px",
+                      animationDuration: "2000ms",
+
+                    }}
                     className="arrow1" />
                   <path
-                    d={arrow1_2}
+                    d={arrow3_2}
                     strokeWidth={5}
                     stroke="currentColor"
+                    style={{
+                      animationDuration: "0ms",
+                      animationDelay: "1900ms",
+                      strokeWidth: "32px"
+                    }}
                     className="arrow2" />
                 </g>}
                 style={{
@@ -107,21 +166,22 @@ const PlayPage: React.FC = () => {
                 }}
                 props={{
                   fill: "none",
-                  viewBox: "0 0 100 100"
+                  viewBox: "0 0 512 512"
                 }}
               />
             </div>
-            <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -50, bottom: 50, padding: 16, minWidth: 160, rotate: "10deg" } }}>
+            <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -140, bottom: 70, padding: 16, minWidth: 160, rotate: "-5deg" } }}>
               <Typography style={{ color: colors.primary }}>
-                вистави не тривають 0 хв! 🙄 🕓
+                {correctnessWarningTxt}
               </Typography>
             </Container>
           </div>
         </div>}
 
+
+
+
         {data && lastSavedData ? <>
-
-
 
           <FloatingContainer style={{
             left: undefined,
@@ -147,8 +207,11 @@ const PlayPage: React.FC = () => {
               onClick={() => handleDelete(data.play_id)}
             />
           </FloatingContainer>
+
+
           {/* title */}
           <EditableField size="h1" textarea={{
+            ref: titleRef,
             value: data.name,
             onChange: v => (changeField(v.currentTarget.value, "name", setData))
           }} />
@@ -159,19 +222,110 @@ const PlayPage: React.FC = () => {
                 <Typography style={{ color: colors["primary-txt"] + "99" }}>
                   Автор:
                 </Typography>
-                <EditableField textarea={{
-                  value: data.author,
-                  onChange: v => (changeField(v.currentTarget.value, "author", setData)),
-                }} />
+                <div style={{
+                  position: "relative",
+                  overflow: "visible"
+                }}>
+
+                  <EditableField textarea={{
+                    value: data.author,
+                    onChange: v => (changeField(v.currentTarget.value, "author", setData)),
+                  }} />
+
+                  {data && !boolData.author && <div className="arrow-message fade-apear" ref={refNote2} style={{ position: "absolute", left: -65, top: 50, zIndex: 3 }}>
+                    <div style={{ position: "relative" }}>
+                      <div style={{ position: "absolute", right: 0, bottom: "0px", rotate: "20deg" }}>
+                        <Icon
+                          path={<g>
+                            <path
+                              d={arrow2_2}
+                              strokeWidth={5}
+                              stroke="currentColor"
+                              style={{
+                                strokeWidth: "32px"
+                              }}
+                              className="arrow1" />
+                            <path
+                              d={arrow2_1}
+                              strokeWidth={5}
+                              stroke="currentColor"
+                              style={{
+                                animationDuration: "0ms",
+                                animationDelay: "3000ms",
+                                strokeWidth: "32px"
+                              }}
+                              className="arrow2" />
+                          </g>}
+                          style={{
+                            width: 80,
+                            color: colors.arrow,
+                          }}
+                          props={{
+                            fill: "none",
+                            viewBox: "0 0 512 512"
+                          }}
+                        />
+                      </div>
+                      <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, right: 20, bottom: 80, padding: 16, minWidth: 160, rotate: "10deg" } }}>
+                        <Typography style={{ color: colors.primary }}>
+                          а хто автор цього шедевру? 🤔🤔🤔
+                        </Typography>
+                      </Container>
+                    </div>
+                  </div>}
+                </div>
                 {/* duration */}
+
                 <ClockCircleOutlined style={{
                   fontSize: 20,
                   color: colors["primary-txt"] + "99",
                 }} />
-                <EditableField size="fixed" textarea={{
-                  value: duration2str(data.duration),
-                  onChange: v => changeTime(v, setData),
-                }} />
+                <div style={{
+                  position: "relative",
+                  overflow: "visible"
+                }}>
+                  <EditableField size="fixed" textarea={{
+                    value: duration2str(data.duration),
+                    onChange: v => changeTime(v, setData),
+                  }} />
+
+
+                  {data && !boolData.duration && <div className="arrow-message fade-apear" ref={refNote1} style={{
+                    position: "absolute", right: -45, top: 80, zIndex: 3
+                  }}>
+                    <div style={{ position: "relative" }}>
+                      <div style={{ position: "absolute", right: 0, bottom: "0px", rotate: "20deg" }}>
+                        <Icon
+                          path={<g>
+                            <path
+                              d={arrow1_1}
+                              strokeWidth={5}
+                              stroke="currentColor"
+                              className="arrow1" />
+                            <path
+                              d={arrow1_2}
+                              strokeWidth={5}
+                              stroke="currentColor"
+                              className="arrow2" />
+                          </g>}
+                          style={{
+                            width: 80,
+                            color: colors.arrow,
+                          }}
+                          props={{
+                            fill: "none",
+                            viewBox: "0 0 100 100"
+                          }}
+                        />
+                      </div>
+                      <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -50, bottom: 50, padding: 16, minWidth: 160, rotate: "10deg" } }}>
+                        <Typography style={{ color: colors.primary }}>
+                          вистави не тривають 0 хв! 🙄 🕓
+                        </Typography>
+                      </Container>
+                    </div>
+                  </div>}
+                </div>
               </Space>
               <Space size={0}>
                 {/* Genre */}
@@ -207,7 +361,7 @@ const PlayPage: React.FC = () => {
               onChange: v => (changeField(v.currentTarget.value, "description", setData)),
             }} />
 
-            {data != null && lastSavedData != null && !checkSame(data, lastSavedData) && <Space ref={buttonRef} style={{ width: "100%", justifyContent: "center" }}>
+            {data && boolData && checkIfAllCorrect(data, lastSavedData, boolData) && <Space ref={buttonRef} style={{ width: "100%", justifyContent: "center" }}>
               <Button className="fade-apear" color="pink" variant="solid" shape="round" onClick={handleSave}>
                 Зберегти
               </Button>
