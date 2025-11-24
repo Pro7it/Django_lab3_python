@@ -10,5 +10,5 @@ export const colors = {
     accent: "#eb2f96",
     "primary-txt": "#594545",
     "floating-btn": "hsla(0, 53%, 60%, 1.00)",
-
+    "arrow": "hsla(0, 53%, 60%, 1.00)"
 }

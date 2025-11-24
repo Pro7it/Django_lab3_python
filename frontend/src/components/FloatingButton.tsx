@@ -14,7 +14,8 @@ export const FloatingButton: React.FC<{
     onClick: React.MouseEventHandler<HTMLDivElement>,
     inContainer?: boolean,
     style?: React.CSSProperties
-}> = ({ onClick, style, inContainer, Icon }) => {
+    props?: AntdIconProps
+}> = ({ onClick, style, inContainer, Icon, props }) => {
 
     const positionStyle: React.CSSProperties = !inContainer ? floatDefaultStyle : { position: "relative" }
 
@@ -25,6 +26,6 @@ export const FloatingButton: React.FC<{
             ...style
         }}
         onClick={onClick} >
-        <Icon className="animated-icon-self" style={{ transition: "100ms" }} />
+        <Icon className="animated-icon-self" style={{ transition: "100ms" }} {...props} />
     </div>
 }

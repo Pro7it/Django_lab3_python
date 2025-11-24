@@ -18,6 +18,13 @@ export const checkAllFilled = <T extends object>(V: T, emptyV: T, except?: strin
   });
 }
 
+export const checkSame = <T extends object>(V: T, emptyV: T, except?: string[]) => {
+  return Object.keys(V).every(key => {
+    if (except?.includes(key)) return true
+    return V[key as keyof T] == emptyV[key as keyof T];
+  });
+}
+
 export const changeTime = <T,>(
   v: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   setter: React.Dispatch<React.SetStateAction<T>>,
@@ -26,8 +33,8 @@ export const changeTime = <T,>(
   const inputEl = v.currentTarget
   const curpos = inputEl.selectionStart || 0
   const time = str2duration(v.currentTarget.value)
-
-  if (time) {
+  
+  if (time != null) {
     changeField(time, "duration", setter)
     if (onChanged)
       onChanged()
