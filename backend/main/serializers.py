@@ -26,6 +26,9 @@ class PlaySerializer(serializers.ModelSerializer):
     directors = DirectorSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
     genre = GenreSerializer(read_only=True)
+    image = serializers.ImageField(required=False, allow_null=True)
+
+    #TODO: додати унікальні назви, побудовані на id + розширення файлу, а також видаляти дублювання
 
     director_ids = serializers.PrimaryKeyRelatedField(many=True, queryset=Director.objects.all(), write_only=True)
     actor_ids = serializers.PrimaryKeyRelatedField(many=True, queryset=Actor.objects.all(), write_only=True)
@@ -46,7 +49,6 @@ class PlaySerializer(serializers.ModelSerializer):
         return play
 
     def update(self, instance, validated_data):
-
         actor_ids = validated_data.pop("actor_ids", None)
         director_ids = validated_data.pop("director_ids", None)
         genre_instance = validated_data.pop("genre_id", None)

@@ -70,3 +70,12 @@ export const deleteQuery = (path: string, url: string = Varialbles.backend): Pro
 })
     .then(r => r.ok)
     .catch(e => (errorHandle(e), false))
+
+export const putFormData = (path: string, formData: FormData, url: string = Varialbles.backend) =>
+    fetch(url + path, {
+        method: "PUT",
+        body: formData,
+        })
+    .then(response2obj)
+    .catch(errorHandle);
+      

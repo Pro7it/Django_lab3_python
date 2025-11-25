@@ -19,6 +19,7 @@ export interface Director {
 }
 
 export interface Play {
+  image: string | File |null;
   play_id: number;
   actors: number[] | Actor[];
   directors: number[] | Director[];
@@ -35,6 +36,7 @@ export interface UserLogin {
 }
 
 export const EmptyPlay: Play = {
+    image: null,
     name: "",
     actors: [],
     directors: [],
