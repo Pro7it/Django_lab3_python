@@ -77,5 +77,5 @@ export const putFormData = (path: string, formData: FormData, url: string = Vari
         body: formData,
         })
     .then(response2obj)
-    .catch(errorHandle);
+    .catch(errorHandle);``
       

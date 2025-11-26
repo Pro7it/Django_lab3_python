@@ -34,6 +34,12 @@ import {
 import { createDraggable, createScope, spring, Scope } from "animejs";
 import { FloatingContainer } from "../components/FloatingContainer";
 
+const objA2numA = <T,>(arr: T[] | number[], idField: string): number[] => {
+  if (arr.length > 0 && typeof arr[0] !== "number")
+    return arr.map((o) => (o as T)[idField as keyof T] as number);
+  return arr as number[];
+};
+
 const PlayPage: React.FC = () => {
   const params = useParams<{ playid: string }>();
   const [data, setData] = useState<Play | null>(null);
@@ -62,31 +68,6 @@ const PlayPage: React.FC = () => {
         : messageApi?.error("error ocurred", 0.5)
     );
 
-  // const handleSave = () => {
-  //   if (data) {
-  //     const Data = {
-  //       ...data,
-  //       genre_id:
-  //         typeof data.genre === "number" ? data.genre : data.genre.genre_id,
-  //       actor_ids:
-  //         data.actors.length > 0 && typeof data.actors[0] != "number"
-  //           ? data.actors.map((a) => (a as Actor).actor_id)
-  //           : data.actors,
-  //       director_ids:
-  //         data.directors.length > 0 && typeof data.directors[0] != "number"
-  //           ? data.directors.map((a) => (a as Director).director_id)
-  //           : data.directors,
-  //       // image: typeof data.image === "string" ? data.image : null,
-  //     };
-  // putQuery(`api/plays/${Data.play_id}/`, Data).then((r) =>
-  //       r
-  //         ? (setLastSavedData(data),
-  //           messageApi?.success("succesfully saved!", 0.5))
-  //         : messageApi?.error("error ocurred", 0.5)
-  //     );
-  //   }
-  // };
-
   const handleSave = () => {
     if (!data) return;
 
@@ -97,26 +78,14 @@ const PlayPage: React.FC = () => {
     formData.append("description", data.description);
     formData.append("duration", data.duration.toString());
 
-    formData.append(
-      "genre_id",
-      typeof data.genre === "number"
-        ? data.genre.toString()
-        : data.genre.genre_id.toString()
+    objA2numA([data.genre], "genre_id").map((g) =>
+      formData.append("genre_id", g.toString())
     );
 
-    const actor_ids =
-      data.actors.length > 0 && typeof data.actors[0] !== "number"
-        ? (data.actors as Actor[]).map((a) => a.actor_id)
-        : (data.actors as number[]);
-
-    actor_ids.forEach((id) => formData.append("actor_ids", id.toString()));
-
-    const director_ids =
-      data.directors.length > 0 && typeof data.directors[0] !== "number"
-        ? (data.directors as Director[]).map((d) => d.director_id)
-        : (data.directors as number[]);
-
-    director_ids.forEach((id) =>
+    objA2numA(data.actors, "actor_id").forEach((id) =>
+      formData.append("actor_ids", id.toString())
+    );
+    objA2numA(data.directors, "director_id").forEach((id) =>
       formData.append("director_ids", id.toString())
     );
 
