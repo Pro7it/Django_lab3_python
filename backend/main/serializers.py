@@ -3,7 +3,11 @@ from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import os
 from django.conf import settings
+from PIL import Image, UnidentifiedImageError
+from django.core.exceptions import ValidationError
 
+ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}
+MAX_FILE_SIZE = 5 * 1024 * 1024
 
 def log(line):
     with open("logs.txt", "+a") as f:
@@ -15,7 +19,6 @@ class ActorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
         fields = "__all__"
-
 
 class DirectorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,7 +63,23 @@ class PlaySerializer(serializers.ModelSerializer):
     def _handle_image(self, instance, image_file, image_url):
 
         if image_file:
-            ext = image_file.name.split(".")[-1]
+            ext = image_file.name.split('.')[-1]
+
+            if ext not in ALLOWED_EXTENSIONS:
+                raise ValidationError(f"Umm, nah, i don't know this: {ext}")
+            if image_file.size > MAX_FILE_SIZE:
+                raise ValidationError(f"What do we have here, zip bobm?")
+
+            try:
+                image_file.seek(0)
+                img = Image.open(image_file)
+                img.verify()
+            except:
+                raise ValidationError("Wanna deploy some script, huh?")
+            finally:
+                image_file.seek(0)
+
+            
             filename = f"{instance.play_id}.{ext}"
             file_path = os.path.join(settings.MEDIA_ROOT, "plays", filename)
 
