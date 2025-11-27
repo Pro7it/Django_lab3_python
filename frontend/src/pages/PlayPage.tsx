@@ -68,6 +68,20 @@ const PlayPage: React.FC = () => {
         : messageApi?.error("error ocurred", 0.5)
     );
 
+  const handleDeleteImage = () => {
+    if (!data) return;
+    changeField(null, "image", setData);
+    console.log(data.image);
+    // setData((prev) => {
+    //   if (!prev) return prev;
+
+    //   return {
+    //     ...prev,
+    //     image: null,
+    //   };
+    // });
+  };
+
   const handleSave = () => {
     if (!data) return;
 
@@ -90,7 +104,12 @@ const PlayPage: React.FC = () => {
     );
 
     if (data.image instanceof File) {
-      formData.append("image", data.image);
+      // if (data.image != null) {
+      formData.append("image_file", data.image);
+    } else if (typeof data.image === "string") {
+      formData.append("image_url", data.image);
+    } else {
+      formData.append("image_url", "");
     }
 
     putFormData(`/api/plays/${data.play_id}/`, formData).then((r) =>
@@ -188,7 +207,19 @@ const PlayPage: React.FC = () => {
       <FloatingButton Icon={LeftCircleFilled} onClick={() => navigate(-1)} />
       <Container
         renderItem="div"
-        props={{ ref: refScope, style: { overflow: "hidden" } }}
+        props={{
+          ref: refScope,
+          style: {
+            overflow: "hidden",
+            // backgroundImage: data?.image ? `url(${data.image})` : undefined,
+            backgroundImage: data?.image
+              ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(http://localhost:8000/${data.image})`
+              : undefined,
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+          },
+        }}
         template="outer"
         containerSize="fullsize"
       >
@@ -710,7 +741,6 @@ const PlayPage: React.FC = () => {
                       ),
                   }}
                 />
-
                 {data &&
                   boolData &&
                   checkIfAllCorrect(data, lastSavedData, boolData) && (
@@ -729,42 +759,35 @@ const PlayPage: React.FC = () => {
                       </Button>
                     </Space>
                   )}
+                <Space>
+                  <FloatingButton
+                    style={{
+                      fontSize: 24,
+                      color: colors["primary-txt"] + "79",
+                    }}
+                    inContainer
+                    Icon={DeleteFilled}
+                    onClick={() => handleDeleteImage()}
+                    props={{ className: "animated-icon-self-accent" }}
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
 
-                {data.image ? (
-                  <>
-                    {/* TODO: зробити фотографію на задньому фоні, та додати кнопку видалення фотографії */}
-                    <img
-                      src={`http://localhost:8000/${data.image}`}
-                      alt={data.name}
-                      style={{ maxWidth: 300, borderRadius: 8 }}
-                    />
-                    <Typography style={{ color: colors["primary-txt"] }}>
-                      {" "}
-                      Картинку можна побачити на фоні
-                    </Typography>
-                  </>
-                ) : (
-                  <Typography style={{ color: colors["primary-txt"] }}>
-                    Картинка відсутня
-                  </Typography>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
+                      setData((prev) => {
+                        if (!prev) return prev;
 
-                    setData((prev) => {
-                      if (!prev) return prev;
-
-                      return {
-                        ...prev,
-                        image: file,
-                      };
-                    });
-                  }}
-                />
+                        return {
+                          ...prev,
+                          image: file,
+                        };
+                      });
+                    }}
+                  />
+                </Space>
               </Space>
             </>
           ) : null}
