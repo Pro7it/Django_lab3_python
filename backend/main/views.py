@@ -6,12 +6,17 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.pagination import PageNumberPagination
 
+
+class DefaultPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = "limit"
 
 class BaseViewSet(viewsets.ViewSet):
     repository = None
     serializer_class = None
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def list(self, _):
         objs = self.repository.get_all()
@@ -54,6 +59,7 @@ class BaseViewSet(viewsets.ViewSet):
 class PlayViewSet(BaseViewSet):
     repository = Repository().plays
     serializer_class = PlaySerializer
+    pagination_class = DefaultPagination
 
     @swagger_auto_schema(request_body=serializer_class)
     def create(self, request):
@@ -62,6 +68,15 @@ class PlayViewSet(BaseViewSet):
     @swagger_auto_schema(request_body=serializer_class)
     def update(self, request, pk=None):
         return super().update(request, pk)
+    
+    def list(self, request):
+        objs = self.repository.get_all()
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(objs, request)
+
+        serializer = self.serializer_class(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class ActorViewSet(BaseViewSet):
