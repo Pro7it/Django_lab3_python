@@ -10,9 +10,9 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}
 MAX_FILE_SIZE = 5 * 1024 * 1024
 
 def log(line):
-    with open("logs.txt", "+a") as f:
-        print(line, file=f)
-    f.close()
+    with open('logs.txt', '+a') as f:
+        # print(line, file=f)
+        f.close()
 
 
 class ActorSerializer(serializers.ModelSerializer):
@@ -64,6 +64,22 @@ class PlaySerializer(serializers.ModelSerializer):
 
         if image_file:
             ext = image_file.name.split('.')[-1]
+
+            if ext not in ALLOWED_EXTENSIONS:
+                raise ValidationError(f"Umm, nah, i don't know this: {ext}")
+            if image_file.size > MAX_FILE_SIZE:
+                raise ValidationError(f"What do we have here, zip bobm?")
+
+            try:
+                image_file.seek(0)
+                img = Image.open(image_file)
+                img.verify()
+            except:
+                raise ValidationError("Wanna deploy some script, huh?")
+            finally:
+                image_file.seek(0)
+
+            
 
             if ext not in ALLOWED_EXTENSIONS:
                 raise ValidationError(f"Umm, nah, i don't know this: {ext}")
