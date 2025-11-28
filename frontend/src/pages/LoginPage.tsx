@@ -60,7 +60,12 @@ const LoginPage: React.FC = () => {
         setloading(true)
         e.preventDefault()
         if (checkAllFilled(data, EmptyUserLogin) && !loading) {
-            postQuery(`login/`, data).then(r => {
+            const formData = new FormData();
+            formData.append("email", data.email);
+            formData.append("password", data.password);
+
+
+            postQuery(`login/`, formData).then(r => {
                 const success = (r: { access: string }) => {
                     setToken(r.access)
                     messageApi.success("succesfully saved!", 1).then(() => navigate(-1))

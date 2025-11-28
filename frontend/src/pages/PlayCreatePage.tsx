@@ -14,7 +14,7 @@ const PlayCreatePage = () => {
                 action: (data, _) => {
                     if (!data) return;
                     const formData = formPlayData(data)
-                    
+
                     postQuery(`api/plays/`, formData).then((r) =>
                         r
                             ?

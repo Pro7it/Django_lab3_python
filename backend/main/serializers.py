@@ -4,10 +4,12 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import os
 from django.conf import settings
 
+
 def log(line):
-    with open('logs.txt', '+a') as f:
+    with open("logs.txt", "+a") as f:
         print(line, file=f)
     f.close()
+
 
 class ActorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,6 +27,7 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = "__all__"
+
 
 class PlaySerializer(serializers.ModelSerializer):
     # actors = serializers.PrimaryKeyRelatedField(queryset=Actor.objects.all(), many=True)
@@ -44,27 +47,27 @@ class PlaySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def _delete_instance_files(self, id):
-        plays_dir = os.path.join(settings.MEDIA_ROOT, 'plays')
+        plays_dir = os.path.join(settings.MEDIA_ROOT, "plays")
         if not os.path.exists(plays_dir):
             return
-        
+
         for filename in os.listdir(plays_dir):
-            if filename.startswith(f'{id}'):
-                file_path = os.path.join(plays_dir,filename)
+            if filename.startswith(f"{id}"):
+                file_path = os.path.join(plays_dir, filename)
                 if os.path.isfile(file_path):
                     os.remove(file_path)
 
     def _handle_image(self, instance, image_file, image_url):
 
         if image_file:
-            ext = image_file.name.split('.')[-1]
+            ext = image_file.name.split(".")[-1]
             filename = f"{instance.play_id}.{ext}"
-            file_path = os.path.join(settings.MEDIA_ROOT, 'plays', filename)
+            file_path = os.path.join(settings.MEDIA_ROOT, "plays", filename)
 
             if os.path.exists(file_path):
                 os.remove(file_path)
 
-            instance.image.save(filename,image_file,save=True)
+            instance.image.save(filename, image_file, save=True)
 
         elif image_url == "":
             self._delete_instance_files(instance.play_id)
@@ -76,9 +79,24 @@ class PlaySerializer(serializers.ModelSerializer):
         director_ids = validated_data.pop("director_ids", [])
         genre_instance = validated_data.pop("genre_id", None)
 
+        image_file = validated_data.pop("image_file", None)
+        #!
+        validated_data.pop("image_url", None)
+
         play = Play.objects.create(genre=genre_instance, **validated_data)
         play.actors.set(actor_ids)
         play.directors.set(director_ids)
+
+        #! WARNING я додала це на основі save але треба перевірити (сервер неправильно приймав фото)
+        if image_file:
+            ext = image_file.name.split(".")[-1]
+            filename = f"{play.play_id}.{ext}"
+            file_path = os.path.join(settings.MEDIA_ROOT, "plays", filename)
+
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            play.image.save(filename, image_file, save=True)
+
         return play
 
     def update(self, instance, validated_data):
@@ -88,9 +106,6 @@ class PlaySerializer(serializers.ModelSerializer):
         genre_instance = validated_data.pop("genre_id", None)
         image_file = validated_data.pop("image_file", None)
         image_url = validated_data.pop("image_url", None)
-        log(image_url)
-        log(image_file)
-        log(" ")
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -109,7 +124,6 @@ class PlaySerializer(serializers.ModelSerializer):
         self._handle_image(instance, image_file, image_url)
 
         return instance
-    
 
 
 class HallSerializer(serializers.ModelSerializer):

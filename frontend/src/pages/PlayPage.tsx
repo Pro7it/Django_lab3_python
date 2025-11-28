@@ -1,4 +1,4 @@
-import { getQuery, putFormData } from "../utils/RestUtils";
+import { getQuery, putQuery } from "../utils/RestUtils";
 import { useMessage } from "../utils/StateManager";
 import CRUDPlayPage, { formPlayData } from "./CRUDPlayPage"
 
@@ -13,8 +13,7 @@ const PlayPage = () => {
                 action: (data, setLastSavedData) => {
                     if (!data) return;
                     const formData = formPlayData(data)
-
-                    putFormData(`/api/plays/${data.play_id}/`, formData).then((r) =>
+                    putQuery(`/api/plays/${data.play_id}/`, formData).then((r) =>
                         r
                             ? (setLastSavedData(data),
                                 messageApi?.success("успішно збережено!", 0.5))
