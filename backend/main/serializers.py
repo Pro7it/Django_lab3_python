@@ -80,22 +80,15 @@ class PlaySerializer(serializers.ModelSerializer):
         genre_instance = validated_data.pop("genre_id", None)
 
         image_file = validated_data.pop("image_file", None)
-        #!
-        validated_data.pop("image_url", None)
+        image_url = validated_data.pop("image_url", None)
 
         play = Play.objects.create(genre=genre_instance, **validated_data)
         play.actors.set(actor_ids)
         play.directors.set(director_ids)
 
         #! WARNING я додала це на основі save але треба перевірити (сервер неправильно приймав фото)
-        if image_file:
-            ext = image_file.name.split(".")[-1]
-            filename = f"{play.play_id}.{ext}"
-            file_path = os.path.join(settings.MEDIA_ROOT, "plays", filename)
+        self._handle_image(play, image_file, image_url)
 
-            if os.path.exists(file_path):
-                os.remove(file_path)
-            play.image.save(filename, image_file, save=True)
 
         return play
 
