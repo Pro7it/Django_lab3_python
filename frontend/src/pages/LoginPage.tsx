@@ -68,7 +68,7 @@ const LoginPage: React.FC = () => {
             postQuery(`login/`, formData).then(r => {
                 const success = (r: { access: string }) => {
                     setToken(r.access)
-                    messageApi.success("succesfully saved!", 1).then(() => navigate(-1))
+                    messageApi.success("succesfully saved!", 1).then(() => window.history.length > 1 ? navigate(-1) : navigate("/"))
                 }
 
                 r ? success(r as { access: string }) : messageApi.error("error ocurred", 0.5).then(() => setloading(false))
