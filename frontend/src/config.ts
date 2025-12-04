@@ -9,6 +9,6 @@ export const colors = {
     secondary: "#f1d2d2",
     accent: "#eb2f96",
     "primary-txt": "#594545",
-    "floating-btn": "hsla(0, 53%, 60%, 1.00)",
-
+    "floating-btn": "#cf6363",
+    "arrow": "hsla(0, 53%, 60%, 1.00)"
 }

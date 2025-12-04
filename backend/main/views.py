@@ -1,3 +1,4 @@
+from main.filter import PlayFilter
 from .repository.Repository import Repository
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -5,11 +6,19 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
-class BaseViewSet(viewsets.ViewSet):
+
+class DefaultPagination(PageNumberPagination):
+    # page_size = 10
+    page_size_query_param = "limit"
+
+class BaseViewSet(viewsets.GenericViewSet):
     repository = None
     serializer_class = None
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def list(self, _):
         objs = self.repository.get_all()
@@ -33,7 +42,8 @@ class BaseViewSet(viewsets.ViewSet):
 
     def update(self, request, pk=None):
         instance = self.repository.get_by_id(pk)
-        if instance is None: return Response({"detail": f"Object with id={pk} not found"}, status=404)
+        if instance is None:
+            return Response({"detail": f"Object with id={pk} not found"}, status=404)
 
         serializer = self.serializer_class(instance, data=request.data, partial=False)
         if serializer.is_valid():
@@ -51,6 +61,9 @@ class BaseViewSet(viewsets.ViewSet):
 class PlayViewSet(BaseViewSet):
     repository = Repository().plays
     serializer_class = PlaySerializer
+    pagination_class = DefaultPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PlayFilter
 
     @swagger_auto_schema(request_body=serializer_class)
     def create(self, request):
@@ -59,6 +72,16 @@ class PlayViewSet(BaseViewSet):
     @swagger_auto_schema(request_body=serializer_class)
     def update(self, request, pk=None):
         return super().update(request, pk)
+    
+    def list(self, request):
+        objs = self.repository.get_all()
+        queryset = self.filter_queryset(objs)
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request)
+
+        serializer = self.serializer_class(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class ActorViewSet(BaseViewSet):
@@ -124,10 +147,10 @@ class ScheduleViewSet(BaseViewSet):
     @swagger_auto_schema(request_body=serializer_class)
     def update(self, request, pk=None):
         return super().update(request, pk)
-    
-    @action(detail=False, methods=['get'], url_path='stats')
+
+    @action(detail=False, methods=["get"], url_path="stats")
     def stats(self, _):
-        report = self.repository.get_stats()  
+        report = self.repository.get_stats()
         return Response(report)
 
 
@@ -177,9 +200,33 @@ class UserViewSet(BaseViewSet):
     @swagger_auto_schema(request_body=serializer_class)
     def create(self, request):
         self.get_serializer_class()
-        return super().create(request)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            obj = self.repository.create(**validated_data)
+            if obj is None:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            response_serializer = self.serializer_class(obj)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(request_body=serializer_class)
     def update(self, request, pk=None):
         self.get_serializer_class()
-        return super().update(request, pk)
+        instance = self.repository.get_by_id(pk)
+        if instance is None:
+            return Response(f"there is no object with id = {pk}", status=404)
+
+        serializer = self.serializer_class(instance, data=request.data, partial=False)
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            instance = self.repository.update(instance, **validated_data)
+            response_serializer = self.serializer_class(instance)
+            return Response(response_serializer.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer

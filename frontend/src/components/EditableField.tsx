@@ -1,7 +1,8 @@
 import type React from "react"
-import { colors } from "../../config"
+import { colors } from "../config"
 import type { TextAreaProps } from "antd/es/input"
 import Input from "antd/es/input"
+import type { TextAreaRef } from "antd/es/input/TextArea"
 
 
 const EditableStyles: {
@@ -26,7 +27,6 @@ const EditableStyles: {
         width: 120,
     },
     regular: {
-
     }
 }
 
@@ -34,7 +34,7 @@ const EditableStyles: {
 
 export interface EditableFieldProps {
     size?: "regular" | "h1" | "fixed",
-    textarea: TextAreaProps
+    textarea: TextAreaProps & React.RefAttributes<TextAreaRef>
 }
 
 
@@ -42,14 +42,12 @@ const EditableField: React.FC<EditableFieldProps> = ({
     size = "regular",
     textarea
 }) => {
-    const {
-        autoSize = { minRows: 1 },
-        variant = "borderless",
-    } = textarea
     return <Input.TextArea
-        autoSize={autoSize}
-        variant={variant} {...textarea}
+        autoSize={{ minRows: 1 }}
+        variant="borderless"
+        {...textarea}
         style={{
+            // overflowY: "visible",
             ...EditableStyles.default,
             ...EditableStyles[size],
             ...textarea.style,

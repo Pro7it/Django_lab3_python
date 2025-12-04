@@ -6,7 +6,7 @@ class BaseRepository(ABC):
         self.model = model
 
     def get_all(self):
-        return list(self.model.objects.all())
+        return self.model.objects.all()
 
     def get_by_id(self, _id):
         return self.model.objects.filter(pk=_id).first()

@@ -19,6 +19,7 @@ export interface Director {
 }
 
 export interface Play {
+  image: string | File | null;
   play_id: number;
   actors: number[] | Actor[];
   directors: number[] | Director[];
@@ -26,10 +27,24 @@ export interface Play {
   duration: number;
   description: string;
   author: string;
-  genre: number | Genre;
+  genre: number | Genre | null;
 }
 
 export interface UserLogin {
   email: string,
   password: string
 }
+
+export const EmptyPlay: Play = {
+  image: null,
+  name: "",
+  actors: [],
+  directors: [],
+  author: "",
+  description: "",
+  duration: 0,
+  genre: null,
+  play_id: 0
+}
+
+export const checkInvalid = <T extends keyof Play>(field: T, v: Play[T]) => v == EmptyPlay[field]

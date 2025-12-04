@@ -24,39 +24,146 @@
   background-color: transparent;
   border: 3px solid transparent;
 }
+
+
 body {
   background-color: #f1dfd2;
-}
-
-#root, body {
   padding: 0 !important;
   margin: 0 !important;
-  width: 100dvw;
+  width: 100%;
   height: 100dvh;
+  padding-inline: 0 !important;
 }
 
-.animated-icon:hover .animated-icon-self{
-    color: #594545;
-    scale: 1.1;
+#root {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100%;
+  height: 100%;
+  padding-inline: 0 !important;
 }
 
-.animated-icon:active .animated-icon-self{
-    color: #594545;
-    scale: 1.2;
+.animated-icon:hover .animated-icon-self {
+  color: #594545;
+  scale: 1.1;
 }
 
-.input-number-edit, .input-number-edit>div{
+.animated-icon:active .animated-icon-self {
+  color: #594545;
+  scale: 1.2;
+}
+
+
+.animated-icon:hover .animated-icon-self-accent {
+  color: #eb2f96;
+  scale: 1.1;
+}
+
+.animated-icon:active .animated-icon-self-accent {
+  color: #eb2f96;
+  scale: 1.2;
+}
+
+.input-number-edit,
+.input-number-edit>div {
   width: fit-content;
   padding: 0;
 }
 
-.input-number-edit>div>input{
+.input-number-edit>div>input {
   padding: 0 !important;
   width: 32px !important;
   padding: 4px !important;
 }
 
-.select-edit .ant-select-selection-item{
+.select-edit .ant-select-selection-item {
   padding-inline-end: 0px !important;
   /* padding-inline: 4px !important; */
+}
+
+input:-webkit-autofill {
+  -webkit-background-clip: text;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 20px 20px #5d5a5a00;
+}
+
+
+.arrow1 {
+  /* stroke-dasharray: 100;
+  stroke-dashoffset: 700; */
+  animation: draw 5900ms 500ms linear alternate forwards;
+}
+
+.arrow2 {
+  /* stroke-dasharray: 100;
+  stroke-dashoffset: 700; */
+  animation: draw 3300ms 900ms linear alternate forwards;
+}
+
+.arrow1,
+.arrow2 {
+  stroke-dasharray: 1300px;
+  stroke-dashoffset: 1300px;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.fade-apear {
+  opacity: 0;
+  animation: fade-apear 1650ms linear alternate forwards;
+}
+
+@keyframes fade-apear {
+  to {
+    opacity: 1;
+  }
+}
+
+.ant-select-selection-item-content {
+  margin-right: 12px;
+}
+
+.ant-select-selection-item{
+  background: transparent !important;
+}
+
+.ant-select-selection-item-remove{
+  display: none !important;
+}
+
+.ant-select-selection-item:hover .ant-select-selection-item-remove{
+  display: inline-flex !important;
+}
+
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(2, max-content); /* кількість колонок */
+  grid-auto-rows: max-content;
+  gap: 4px 16px; /* рядок, колонка */
+}
+
+.ant-select-selection-placeholder{
+  inset-inline-start: 0 !important;
+  inset-inline-end: 0 !important;
+  min-width: 100px;
+}
+
+.ant-select-selector{
+  min-width: 100px;
+}
+
+.btn-hover {
+  transition: 200ms;
+}
+
+.btn-hover:hover {
+  scale: 1.01;
+}
+
+.btn-hover:active {
+  scale: 1.05;
 }

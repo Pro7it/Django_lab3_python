@@ -55,7 +55,8 @@ class Play(models.Model):
     author = models.CharField(max_length=100, blank=True, null=True)
     actors = models.ManyToManyField('Actor', through='PlayActor', related_name='plays')
     directors = models.ManyToManyField('Director', through='PlayDirector', related_name='plays')
-
+    image = models.ImageField(upload_to="plays", null=True, blank=True)
+    
     class Meta:
         db_table = 'Play'
 
@@ -74,9 +75,6 @@ class Hall(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.capacity}) - {self.theatre}\n'
-
-
-
 
 class PlayActor(models.Model):
     pk = models.CompositePrimaryKey('play_id', 'actor_id')

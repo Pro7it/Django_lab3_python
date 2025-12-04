@@ -9,3 +9,4 @@ sops_key.txt
 **/.env
 self.log
 **/node_modules
+backend/media

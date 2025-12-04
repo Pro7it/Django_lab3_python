@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:15
-    container_name: ${DOCKER_BD_CONTAINER_NAME}
+    # container_name: ${DOCKER_BD_CONTAINER_NAME}
     restart: always
     env_file:
       - ./backend/.env  
@@ -33,6 +33,21 @@ services:
       - /app/node_modules
     ports:
       - "5173:5173"
+    depends_on:
+      - backend
+    command: sh -c "npm install && npm run dev -- --host"
+
+
+  # nginx:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./frontend/dist:/app/frontend/dist
+  #     - ./backend/media:/app/backend/media
+  #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - backend
 
 volumes:
   db_lab: 
