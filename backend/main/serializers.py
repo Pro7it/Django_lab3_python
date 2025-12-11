@@ -9,10 +9,10 @@ from django.core.exceptions import ValidationError
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}
 MAX_FILE_SIZE = 5 * 1024 * 1024
 
-def log(line):
-    with open('logs.txt', '+a') as f:
-        # print(line, file=f)
-        f.close()
+# def log(line):
+#     with open('logs.txt', '+a') as f:
+#         # print(line, file=f)
+#         f.close()
 
 
 class ActorSerializer(serializers.ModelSerializer):

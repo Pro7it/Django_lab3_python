@@ -28,6 +28,7 @@ export interface Play {
   description: string;
   author: string;
   genre: number | Genre | null;
+  saved: boolean
 }
 
 export interface UserLogin {
@@ -44,7 +45,8 @@ export const EmptyPlay: Play = {
   description: "",
   duration: 0,
   genre: null,
-  play_id: 0
+  play_id: 0,
+  saved: false,
 }
 
 export const checkInvalid = <T extends keyof Play>(field: T, v: Play[T]) => v == EmptyPlay[field]

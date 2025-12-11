@@ -156,7 +156,7 @@ input:-webkit-autofill {
   min-width: 100px;
 }
 
-.btn-hover {
+.btn-hover, .plays-arrow-btn-hover {
   transition: 200ms;
 }
 
@@ -166,4 +166,21 @@ input:-webkit-autofill {
 
 .btn-hover:active {
   scale: 1.05;
+}
+
+#scroll-container * {
+  transition: none !important;
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+.plays-arrow-btn-hover:hover{
+  scale: 1.16;
+}
+.plays-arrow-btn-hover:active {
+  scale: 1.23;
 }

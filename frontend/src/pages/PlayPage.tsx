@@ -40,7 +40,7 @@ const PlayPage = () => {
                     );
                 },
             }}
-            actions={["delete", "undo"]}
+            actions={["delete", "undo", "save"]}
         />
     </>
 }

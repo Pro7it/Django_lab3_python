@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { postQuery } from "../utils/RestUtils";
 import { type UserLogin } from '../utils/ApiDtos';
 import { Button, Input, message, Space, Typography } from "antd";
@@ -15,6 +15,7 @@ import { createDraggable, createScope, Scope, spring } from "animejs";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import { changeField, checkAllFilled } from "../utils/HookFolders";
+import { validateEmail, validatePassword } from "../utils/LoginValidators";
 
 gsap.registerPlugin(Flip)
 
@@ -52,7 +53,15 @@ const LoginPage: React.FC = () => {
     const scope = useRef<Scope>(null)
     const refScope = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null);
-    const buttonRef = useRef<HTMLDivElement>(null);
+    const [helpMsg, setHelpMsg] = useState<string>("Спробуй ввести пошту та пороль) ✨ 🔑")
+    const successMsg = "Молодчинка🌸 спробуй увійти"
+
+    useEffect(() => {
+        const email = validateEmail(data.email)
+        const password = validatePassword(data.password)
+        setHelpMsg(email ?? password ?? successMsg)
+
+    }, [data])
 
     const navigate = useNavigate()
 
@@ -91,9 +100,6 @@ const LoginPage: React.FC = () => {
     }, [])
 
 
-    useEffect(() => SmoothButton(containerRef, buttonRef, () => (data.email.trim() != "" && data.password !== "")), [data]);
-
-
     return <div style={ContainerStyles.containerSize.fullsize}>
         {contextHolder}
         <FloatingButton Icon={LeftCircleFilled} onClick={() => navigate("/")} />
@@ -126,10 +132,8 @@ const LoginPage: React.FC = () => {
                                 }}
                             />
                         </div>
-                        <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -30, bottom: 50, padding: 16, minWidth: 120, rotate: "10deg" } }}>
-                            <Typography style={{ color: colors.primary }}>
-                                Спробуй ввести пошту та пороль) ✨ 🔑
-                            </Typography>
+                        <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -30, bottom: 50, padding: 16, minWidth: 130, rotate: "10deg" } }}>
+                            <Typography style={{ color: colors.primary }} children={helpMsg} />
                         </Container>
                     </div>
                 </div>
@@ -164,13 +168,13 @@ const LoginPage: React.FC = () => {
                                     padding: 0,
                                 }}
                             />
-                            <Space ref={buttonRef} style={{ width: "100%", justifyContent: "center", display: "none" }}>
+                            {helpMsg == successMsg && <Space className="fade-apear" style={{ width: "100%", justifyContent: "center" }}>
                                 <Button loading={loading} disabled={loading} style={{
                                     marginTop: 16,
                                 }} htmlType="submit" color="pink" variant="solid" shape="round">
                                     Увійти
                                 </Button>
-                            </Space>
+                            </Space>}
                         </Space>
                     </Space>
 
