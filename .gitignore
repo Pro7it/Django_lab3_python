@@ -10,3 +10,4 @@ sops_key.txt
 self.log
 **/node_modules
 backend/media
+*/.vite/

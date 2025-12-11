@@ -7,7 +7,6 @@ import { colors } from "../config";
 import { FloatingButton } from "../components/FloatingButton";
 import PlayLink from "../components/PlayLink";
 import {
-  CaretLeftOutlined,
   LeftCircleFilled,
   LeftOutlined,
   PlusCircleFilled,
