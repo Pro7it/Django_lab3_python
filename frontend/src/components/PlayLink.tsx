@@ -10,6 +10,9 @@ const PlayLink = React.memo(({ play }: { play: Play }) => {
       shape="round"
       color="pink"
       size="middle"
+      style={{
+        marginLeft: "8px", marginTop: "8px"
+      }}
     >
       {play.name}
     </Button>

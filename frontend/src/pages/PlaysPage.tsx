@@ -8,9 +8,7 @@ import { FloatingButton } from "../components/FloatingButton";
 import PlayLink from "../components/PlayLink";
 import {
   LeftCircleFilled,
-  LeftOutlined,
   PlusCircleFilled,
-  RightOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { FloatingContainer } from "../components/FloatingContainer";
@@ -27,46 +25,15 @@ const PlaysPage: React.FC = () => {
   const [genreFilter, setGenreFilter] = useState<string | null>(null);
   const [genres, setGenres] = useState<Genre[]>([]);
   const navigate = useNavigate();
-  const limit = 20;
-
-
-
-
-
-
-
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const updateScrollButtons = () => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    setCanScrollPrev(container.scrollLeft > 0);
-    setCanScrollNext(container.scrollLeft + container.clientWidth < container.scrollWidth - 1);
-  };
-
-  function scrollLeft() {
-    document.getElementById("scroll-container")?.scrollBy({ left: -200, behavior: "smooth" })
-  }
-
-  function scrollRight() {
-    document.getElementById("scroll-container")?.scrollBy({ left: 200, behavior: "smooth" })
-  }
-
-
-
-
+  const limit = 10;
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const { observe } = useInView({
-    root: document.getElementById("scroll-container"),
+    root: containerRef.current,
     rootMargin: "0px 0px 0px 0px",
     threshold: 0.1,
-    onEnter: ({ scrollDirection, entry }) => {
+    onEnter: ({ }) => {
       console.log("Елемент став видимим!");
-      console.log("Напрямок:", scrollDirection.horizontal);
-      console.log("Entry:", entry);
       if (nextPage) loadNext()
     },
   });
@@ -84,7 +51,7 @@ const PlaysPage: React.FC = () => {
   };
 
   useEffect(() => {
-    getQuery(`api/plays/?limit=${limit}&_=${Date.now()}`).then((e: any) => {
+    getQuery(`api/plays/?limit=${30 }&_=${Date.now()}`).then((e: any) => {
       if (e !== null) {
         setData(e.results);
         setNextPage(e.next);
@@ -93,7 +60,6 @@ const PlaysPage: React.FC = () => {
     });
     getQuery(`api/genres`).then((e) => {
       if (e) setGenres(e as Genre[]);
-      console.log(e);
     });
   }, []);
 
@@ -113,7 +79,6 @@ const PlaysPage: React.FC = () => {
     });
   };
 
-  useEffect(() => { updateScrollButtons() }, [genreFilter, data])
 
   return (
     <>
@@ -144,8 +109,8 @@ const PlaysPage: React.FC = () => {
           props={{
             style: {
               display: "inline-flex",
-              flexDirection: "row",
-              gap: 8,
+              flexDirection: "column",
+              // gap: 8,
               marginBottom: 16,
               padding: 32,
               backgroundColor:
@@ -187,90 +152,43 @@ const PlaysPage: React.FC = () => {
           </Select>
 
 
-          <div style={{ maxWidth: 400, position: "relative", paddingInline: "24px" }} className="hide-scroll">
-            {canScrollPrev && <div
-              onClick={scrollLeft}
-              className="plays-arrow-btn-hover"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 5,
-                zIndex: 20,
-                height: "100%",
-                width: "auto",
-                fontSize: "16px",
-                aspectRatio: "1/1",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "",
-                cursor: "pointer",
-              }}>
-              <LeftOutlined style={{
-                background: colors.secondary + "aa",
-                borderRadius: 500,
-                padding: 6,
-                color: colors["primary-txt"] + "77",
-              }} />
-            </div>}
-            {canScrollNext && <div
-              onClick={scrollRight}
-              className="plays-arrow-btn-hover"
-              style={{
-                position: "absolute",
-                top: 0,
-                right: -25,
-                zIndex: 20,
-                height: "100%",
-                width: "auto",
-                fontSize: "16px",
-                aspectRatio: "1/1",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "",
-                cursor: "pointer",
-              }}>
-              <RightOutlined style={{
-                background: colors.secondary + "aa",
-                borderRadius: 500,
-                padding: 6,
-                color: colors["primary-txt"] + "77",
-              }} />
-            </div>}
+          {/* <div style={{ maxWidth: 300, , position: "relative", overflowY: "auto" }} className="hide-scroll"> */}
 
-            <div
-              ref={containerRef}
-              onScroll={updateScrollButtons}
-              className="hide-scroll"
-              id="scroll-container"
-              style={{
-                scrollbarWidth: "none",
-                overflowX: "auto",
-                display: "flex",
-                gap: "20px",
-                width: "100%",
-                whiteSpace: "nowrap",
-                padding: " 0 16px",
-                maskImage: data ? "linear-gradient(to right, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)" : undefined,
-                WebkitMaskImage: data ? "linear-gradient(to right, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)" : undefined,
-              }}
-            >
-              {data.map((play) => <PlayLink key={play.play_id} play={play} />)}
+          <div
+            className="hide-scroll"
+            ref={containerRef}
+            id="scroll-container"
+            style={{
+              maxWidth: 700,
+              maxHeight: 300,
+              scrollbarWidth: "none",
+              overflowY: "auto",
+              width: "100%",
+              paddingTop: "24px",
+              paddingBottom: "24px",
+              maskImage: data ? "linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)" : undefined,
+              WebkitMaskImage: data ? "linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)" : undefined,
+            }}
+          >
+            {data.map((play) => <PlayLink key={play.play_id} play={play} />)}
 
-              {!!nextPage && (
-                <Space
-                  size={20}
-                  ref={observe}
-                  direction="horizontal">
-                  <Skeleton.Button active shape="round" size="default" />
-                  <Skeleton.Button style={{ width: 90 }} active shape="round" size="default" />
-                  <Skeleton.Button active shape="round" size="default" />
-                </Space>
-              )}
-            </div>
-
+            {!!nextPage && (
+              <Space
+                style={{
+                  paddingTop: 8,
+                  paddingLeft: 8
+                }}
+                size={8}
+                ref={observe}
+                direction="horizontal">
+                <Skeleton.Button active shape="round" size="default" />
+                <Skeleton.Button style={{ width: 90 }} active shape="round" size="default" />
+                <Skeleton.Button active shape="round" size="default" />
+              </Space>
+            )}
           </div>
+
+          {/* </div>   */}
 
           {data.length === 0 && !loading && (
             <Typography.Title level={5} type="warning">
