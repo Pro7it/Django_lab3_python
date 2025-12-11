@@ -148,9 +148,19 @@ class User(AbstractUser):
     first_name = None
     last_name = None
     date_joined = None
+
+    gender = models.CharField(max_length=20, null=True, blank=True)
+    age = models.IntegerField(default=18)
+    liked_plays = models.ManyToManyField("Play", related_name="liked_by", blank=True)
+    rated_plays = models.ManyToManyField("Play", through="PlayRating", related_name="ratings")
     
     # по ньому буде йти логін
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-    
+class PlayRating(models.Model):
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
+    play = models.ForeignKey("Play", on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    class Meta:
+        unique_together = (("user", "play"),)

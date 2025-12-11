@@ -62,4 +62,4 @@ export const putQuery = (path: string, formData: FormData, url: string = Varialb
         body: formData,
     })
         .then(response2obj)
-        .catch(errorHandle); ``
+        .catch(errorHandle); 

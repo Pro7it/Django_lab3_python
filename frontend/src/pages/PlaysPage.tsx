@@ -24,7 +24,7 @@ const PlaysPage: React.FC = () => {
   const [genreFilter, setGenreFilter] = useState<string | null>(null);
   const [genres, setGenres] = useState<Genre[]>([]);
   const navigate = useNavigate();
-  const limit = 10;
+  const limit = 20;
 
   const fetchPlays = (url?: string) => {
     setLoading(true);
