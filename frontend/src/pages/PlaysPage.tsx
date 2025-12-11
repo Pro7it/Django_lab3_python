@@ -25,7 +25,7 @@ const PlaysPage: React.FC = () => {
   const [genreFilter, setGenreFilter] = useState<string | null>(null);
   const [genres, setGenres] = useState<Genre[]>([]);
   const navigate = useNavigate();
-  const limit = 10;
+  const limit = 30;
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const { observe } = useInView({
@@ -51,7 +51,7 @@ const PlaysPage: React.FC = () => {
   };
 
   useEffect(() => {
-    getQuery(`api/plays/?limit=${30 }&_=${Date.now()}`).then((e: any) => {
+    getQuery(`api/plays/?limit=${limit}&_=${Date.now()}`).then((e: any) => {
       if (e !== null) {
         setData(e.results);
         setNextPage(e.next);
