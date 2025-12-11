@@ -21,9 +21,10 @@ import DeleteActionButton from "../components/CRUDPlayPage/DeleteActionButton";
 import UndoActionButton from "../components/CRUDPlayPage/UndoActionButton";
 import ImageBgContainer from "../components/CRUDPlayPage/ImageBgContainer";
 import HelperMessage from "../components/CRUDPlayPage/HelperMessage";
+import SaveActionButton from "../components/CRUDPlayPage/SaveActionButton";
 
 
-type CRUDPageActionsT = "delete" | "undo"
+type CRUDPageActionsT = "delete" | "undo" | "save"
 
 interface CRUDPageProps {
   // кнопка яка появляється, при зміні даних, якщо вони відповідають правилам валідації
@@ -74,6 +75,7 @@ const CRUDPlayPage: React.FC<CRUDPageProps> = ({
 
             <FloatingContainer style={{ left: undefined, right: 24, top: 12, }} >
               <UploadImage />
+              {actions?.includes("save") && <SaveActionButton />}
               {actions?.includes("undo") && <UndoActionButton />}
               {actions?.includes("delete") && <DeleteActionButton />}
             </FloatingContainer>
