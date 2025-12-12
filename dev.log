@@ -72,3 +72,49 @@ from andrii & olena:
     - увесь стан тепер незалежний від CRUDPlayPage! він реалізований через zustand, знаходиться у utils/StateManager.ts та доступний, як хук usePlayState(s=>s....)
 
 якщо побачите баг скажіть мені, я виправлю (або це стане фічею😽)
+
+
+-----------------------------------------------------------
+
+api агрегованих запитів для графіків (на основі запиту Захара)
+
+(анотація у гібридному форматі, у ts усі числові типи =number і тп.)
+
+/plays/stats/ {
+    play_id: int[]
+    actors_amount: int[]
+    likes_amount: int[]
+    rating: int[]
+    avg_ticket_price: int[]
+    ticked_sold_amount: int[]
+    ticked_free_amount: int[]
+}
+
+/theaters/stats/rating/ {
+    {
+        ...theatre props
+        rating: float[]
+    }[]
+}
+
+/theaters/stats/rating/2/ {
+    theatre_id: int[]
+    rating: float[]
+}
+
+genres/stats/by/name/ {
+    name: string[]
+    amount: int[]
+    avg_actors_age: float[]
+}
+
+tickets/stats/by/date/ {
+    date: string[]
+    avg_price: float[]
+    amount: int[]
+}
+
+tickets/stats/by/month/ {
+    month: int[]
+    amount: int[]
+}

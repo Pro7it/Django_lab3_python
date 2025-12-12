@@ -11,3 +11,4 @@ self.log
 **/node_modules
 backend/media
 */.vite/
+inserters/

@@ -167,6 +167,8 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 
 class TheatreSerializer(serializers.ModelSerializer):
+    rating = serializers.FloatField(read_only=True)
+    
     class Meta:
         model = Theatre
         fields = "__all__"
