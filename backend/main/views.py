@@ -279,7 +279,7 @@ class UserViewSet(BaseViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
-            #obj = serializer.save()
+            # obj = serializer.save()
             obj = self.repository.create(**validated_data)
             if obj is None:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -298,7 +298,7 @@ class UserViewSet(BaseViewSet):
         serializer = self.serializer_class(instance, data=request.data, partial=False)
         if serializer.is_valid():
             validated_data = serializer.validated_data
-            #instance = serializer.save()
+            # instance = serializer.save()
             instance = self.repository.update(instance, **validated_data)
             response_serializer = self.serializer_class(instance)
             return Response(response_serializer.data)
