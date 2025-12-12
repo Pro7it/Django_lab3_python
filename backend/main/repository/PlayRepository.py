@@ -1,5 +1,7 @@
 from .BaseRepository import BaseRepository
 from main.models import *
+from django.db.models import *
+
 
 class PlayRepository(BaseRepository):
     def __init__(self):
@@ -13,14 +15,14 @@ class PlayRepository(BaseRepository):
             setattr(instance, field, value)
 
         if actors is not None:
-            instance.actors.set(actors)  
+            instance.actors.set(actors)
 
         if directors is not None:
-            instance.directors.set(directors)  
+            instance.directors.set(directors)
 
         instance.save()
         return instance
-    
+
     def create(self, **kwargs):
         try:
             actors = kwargs.pop("actors", None)
@@ -30,9 +32,21 @@ class PlayRepository(BaseRepository):
             e.save()
             if actors is not None:
                 e.actors.set(actors)
-            if directors is not None:  
+            if directors is not None:
                 e.directors.set(directors)
             return e
         except Exception as exc:
             print("Error:", exc)
             return None
+
+    def stats(self):
+        qs = self.model.objects.values("play_id").annotate(
+            actors_amount=Count("actors__actor_id"),
+            likes_amount=Count("liked_by__email"),
+            rating=Avg("playrating__rating"),
+            avg_ticket_price=Avg("schedule__ticket__price"),
+            ticked_sold_amount=Count("schedule__ticket__ticket_id", filter=Q(schedule__ticket__status="проданий")),
+            ticked_free_amount=Count("schedule__ticket__ticket_id", filter=Q(schedule__ticket__status="вільний")),
+        )
+
+        return qs
