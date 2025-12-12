@@ -16,10 +16,14 @@
     "animejs": "^4.2.2",
     "antd": "^5.29.0",
     "gsap": "^3.13.0",
+    "plotly.js": "^3.3.0",
+    "randomcolor": "^0.6.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-infinite-scroll-component": "^6.1.0",
+    "react-plotly.js": "^2.6.0",
     "react-router-dom": "^7.9.6",
+    "recharts": "^3.5.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
