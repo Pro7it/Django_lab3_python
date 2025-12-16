@@ -1,3 +1,6 @@
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+import time
+import numpy as np
 import pandas as pd
 from main.filter import PlayFilter
 from .repository.Repository import Repository
@@ -10,8 +13,41 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import *
 
-return_style = "records" # or records
+return_style = "records"  # or records 
+
+
+
+def analitics_for_theater(data):
+    import pandas as pd
+
+    df = pd.DataFrame(data["tickets"])
+    if df.empty:
+        return {"theatre_id": data["theatre_id"], "empty": True}
+    
+    df["time"] = df["time"].apply(lambda x: x.hour)    
+    prices = df["price"].astype(float)
+
+    z = (prices - prices.mean()) / prices.std(ddof=0)
+    
+    # prices2 = df["price"].astype(float).values
+
+    # diff_matrix = np.abs(prices2[:, None] - prices2[None, :])
+    # avg_pair_diff = float(diff_matrix.mean())
+    
+
+    return {
+        "theatre_id": data["theatre_id"],
+        "tickets": int(len(df)),
+        "avg_price": float(prices.mean()),
+        "median_price": float(prices.median()),
+        "p90_price": float(prices.quantile(0.9)),
+        "price_cv": float(prices.std() / prices.mean()),  # варіативність
+        "outliers": int((z.abs() > 3).sum()),  # дорогі/дешеві
+        "peak_hour": int(df["time"].value_counts().idxmax()),
+        # "avg_pair_diff": avg_pair_diff,
+    }
 
 
 class DefaultPagination(PageNumberPagination):
@@ -22,7 +58,7 @@ class DefaultPagination(PageNumberPagination):
 class BaseViewSet(viewsets.GenericViewSet):
     repository = None
     serializer_class = None
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated()]
 
     def list(self, _):
         objs = self.repository.get_all()
@@ -232,6 +268,45 @@ class TheatreViewSet(BaseViewSet):
         df["rating"] = df["rating"].round(1)
         return Response(df[["name", "rating"]].to_dict(return_style))
 
+    def count_tickets_for_theatre(self, theatre_id):
+        query_set = (
+            Ticket.objects.filter(schedule__hall__theatre_id=theatre_id)
+            .annotate(time=F("schedule__time"))
+            .values("price", "time")
+        )
+        
+        return {"theatre_id": theatre_id, "tickets": list(query_set)}
+
+
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEST ПОКИ ЩО
+    @action(detail=False, methods=["get"], url_path="multithread-test")
+    def concurrency_test(self, request):
+        THREADS = int(request.query_params.get("threads", 1))
+
+        theatre_ids = list(self.repository.get_all().values_list("theatre_id", flat=True))
+
+        start = time.perf_counter()
+
+        with ThreadPoolExecutor(max_workers=THREADS) as executor1:
+            data = list(executor1.map(self.count_tickets_for_theatre, theatre_ids))
+            
+        # return Response(data)
+
+        with ProcessPoolExecutor(max_workers=THREADS) as executor2:
+            analitics = list(executor2.map(analitics_for_theater, data))
+
+        elapsed = time.perf_counter() - start
+
+        df = pd.DataFrame({"theatre_id": theatre_ids, "tickets_sold": data, "analitics": analitics})
+
+        response = {
+            "threads": THREADS,
+            "time": round(elapsed, 4),
+            "data": df.to_dict("records"),
+        }
+
+        return Response(response)
+
 
 class TicketViewSet(BaseViewSet):
     repository = Repository().tickets
@@ -281,7 +356,7 @@ class UserViewSet(BaseViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
-            #obj = serializer.save()
+            # obj = serializer.save()
             obj = self.repository.create(**validated_data)
             if obj is None:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -300,7 +375,7 @@ class UserViewSet(BaseViewSet):
         serializer = self.serializer_class(instance, data=request.data, partial=False)
         if serializer.is_valid():
             validated_data = serializer.validated_data
-            #instance = serializer.save()
+            # instance = serializer.save()
             instance = self.repository.update(instance, **validated_data)
             response_serializer = self.serializer_class(instance)
             return Response(response_serializer.data)

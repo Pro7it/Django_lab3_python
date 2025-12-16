@@ -27,7 +27,8 @@ const handleAuth = (data: Response) => {
     }
 
     if (data.status == 401) {
-        data.text().then(r => JSON.parse(r)).then(r => errorAuth(r))
+        location.assign("/login")
+        // data.text().then(r => JSON.parse(r)).then(r => errorAuth(r))
     }
     return Promise.resolve((null))
 }
