@@ -9,9 +9,11 @@ import ErrorPage from "./pages/ErrorPage";
 import PlayPage from "./pages/PlayPage";
 import { ConfigProvider, message, type ThemeConfig } from "antd";
 import { colors } from "./config";
-import PlayCreatePage from './pages/PlayCreatePage';
+import PlayCreatePage from "./pages/PlayCreatePage";
 import LoginPage from "./pages/LoginPage";
 import { useMessage } from "./utils/StateManager";
+import RechartsPage from "./pages/RechartsPage";
+import PlotlyPage from "./pages/PlotlyPage";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +36,15 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
-  }
+  },
+  {
+    path: "/v1",
+    element: <RechartsPage />,
+  },
+  {
+    path: "/v2",
+    element: <PlotlyPage />,
+  },
 ]);
 
 const AntdTheme: ThemeConfig = {
@@ -42,7 +52,7 @@ const AntdTheme: ThemeConfig = {
     colorLink: colors.accent,
     colorText: colors["primary-txt"],
     fontSize: 16,
-    fontWeightStrong: 400
+    fontWeightStrong: 400,
   },
   components: {
     Skeleton: {
@@ -51,10 +61,10 @@ const AntdTheme: ThemeConfig = {
     Select: {
       optionSelectedBg: colors.accent,
       optionActiveBg: colors.accent + "37",
-      colorBgElevated: colors.secondary
+      colorBgElevated: colors.secondary,
     },
     Message: {
-      contentBg: colors.secondary
+      contentBg: colors.secondary,
     },
     Popover: {
       colorBgElevated: colors["floating-btn"],
@@ -62,7 +72,7 @@ const AntdTheme: ThemeConfig = {
       colorTextHeading: colors.primary,
       titleMinWidth: "max-content",
     },
-    Tooltip: {  
+    Tooltip: {
       colorBgSpotlight: colors["floating-btn"],
     },
     Input: {
@@ -70,29 +80,29 @@ const AntdTheme: ThemeConfig = {
       colorBorder: colors.accent,
       activeBorderColor: colors.accent,
       hoverBorderColor: colors.accent,
-
-    }
-  }
-}
+    },
+  },
+};
 
 const Main: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
-  const setMessageApi = useMessage(s => s.setMessageApi)
+  const setMessageApi = useMessage((s) => s.setMessageApi);
 
   useEffect(() => {
     setMessageApi(messageApi);
   }, [messageApi, setMessageApi]);
 
-  return <>
-    {contextHolder}
-    <RouterProvider router={router} />
-  </>
-}
+  return (
+    <>
+      {contextHolder}
+      <RouterProvider router={router} />
+    </>
+  );
+};
 
 ReactDom.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ConfigProvider
-      theme={AntdTheme}>
+    <ConfigProvider theme={AntdTheme}>
       <Main />
     </ConfigProvider>
   </React.StrictMode>
