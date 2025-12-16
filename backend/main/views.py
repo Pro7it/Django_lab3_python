@@ -115,6 +115,16 @@ class PlayViewSet(BaseViewSet):
     def stats_actors(self, _):
         qs = self.repository.stats()
         return Response(pd.DataFrame(list(qs)).fillna(0).to_dict(return_style))
+    
+    @action(detail=True, methods=["post"])
+    def rate(self, request, pk=None):
+        serializer = PlayRatingSerializer(
+            data=request.data,
+            context={"request": request, "view": self, "play_id": pk}
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return Response(result, status=status.HTTP_200_OK)
 
 
 class ActorViewSet(BaseViewSet):

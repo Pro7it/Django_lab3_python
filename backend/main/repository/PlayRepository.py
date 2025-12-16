@@ -60,3 +60,12 @@ class PlayRepository(BaseRepository):
         )
 
         return qs
+
+    def save_user_rating(self, user, play_id, rating_value):
+        play = Play.objects.get(pk=play_id)
+        return PlayRating.objects.update_or_create(
+            user=user,
+            play=play,
+            defaults={"rating": rating_value}
+        )
+

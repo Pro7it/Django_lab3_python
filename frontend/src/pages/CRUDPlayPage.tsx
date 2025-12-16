@@ -22,7 +22,7 @@ import UndoActionButton from "../components/CRUDPlayPage/UndoActionButton";
 import ImageBgContainer from "../components/CRUDPlayPage/ImageBgContainer";
 import HelperMessage from "../components/CRUDPlayPage/HelperMessage";
 import LikeActionButton from "../components/CRUDPlayPage/LikeActionButton";
-// import RatingStars from "../components/CRUDPlayPage/RatingStars";
+import RatingStars from "../components/CRUDPlayPage/RatingStars";
 
 
 type CRUDPageActionsT = "delete" | "undo" | "save"
@@ -92,7 +92,7 @@ const CRUDPlayPage: React.FC<CRUDPageProps> = ({
                 <DirectosField />
               </div>
               <DescriptionField />
-              {/* <RatingStars /> */}
+              <RatingStars />
               <ActionButton active={changed && !valid} onClick={saveBtn.action} text={saveBtn.text} />
             </Space>
           </Container>

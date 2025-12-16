@@ -232,3 +232,15 @@ class PlayLikeToggleSerializer(serializers.Serializer):
 
         liked = Repository().plays.toggle_like(user, play_id)
         return {"liked": liked}
+
+class PlayRatingSerializer(serializers.Serializer):
+    rating = serializers.IntegerField(min_value=1, max_value=5)
+
+    def save(self, **kwargs):
+        user = self.context["request"].user
+        play_id = self.context["play_id"]
+        rating_value = self.validated_data["rating"]
+
+        obj, created = Repository().plays.save_user_rating(user, play_id, rating_value)
+        return {"rating": obj.rating, "play_id": play_id}
+
