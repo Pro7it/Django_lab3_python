@@ -150,7 +150,7 @@ class User(AbstractUser):
     date_joined = None
 
     gender = models.CharField(max_length=20, null=True, blank=True)
-    age = models.IntegerField(default=18)
+    birthdate = models.DateField(null=True)
     liked_plays = models.ManyToManyField("Play", related_name="liked_by", blank=True)
     rated_plays = models.ManyToManyField("Play", through="PlayRating", related_name="ratings")
     

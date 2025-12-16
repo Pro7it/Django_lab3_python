@@ -5,6 +5,7 @@ import os
 from django.conf import settings
 from PIL import Image, UnidentifiedImageError
 from django.core.exceptions import ValidationError
+from .repository.Repository import Repository
 
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}
 MAX_FILE_SIZE = 5 * 1024 * 1024
@@ -44,10 +45,32 @@ class PlaySerializer(serializers.ModelSerializer):
     director_ids = serializers.PrimaryKeyRelatedField(many=True, queryset=Director.objects.all(), write_only=True)
     actor_ids = serializers.PrimaryKeyRelatedField(many=True, queryset=Actor.objects.all(), write_only=True)
     genre_id = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), write_only=True)
+    user_liked = serializers.SerializerMethodField()
+    user_rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Play
         fields = "__all__"
+
+    def get_user_liked(self, obj):
+        request = self.context.get("request")
+        user = request.user if request else None
+
+        if user:
+            return obj.liked_by.filter(pk=user.id).exists()
+
+        return False
+    
+    def get_user_rating(self, obj):
+        request = self.context.get("request")
+        user = request.user if request else None
+
+        if not user or user.is_anonymous:
+            return None
+
+        rating_obj = obj.playrating_set.filter(user_id=user.id).first()
+        return rating_obj.rating if rating_obj else None
+    
 
     def _delete_instance_files(self, id):
         plays_dir = os.path.join(settings.MEDIA_ROOT, "plays")
@@ -94,8 +117,6 @@ class PlaySerializer(serializers.ModelSerializer):
                 raise ValidationError("Wanna deploy some script, huh?")
             finally:
                 image_file.seek(0)
-
-            
             filename = f"{instance.play_id}.{ext}"
             file_path = os.path.join(settings.MEDIA_ROOT, "plays", filename)
 
@@ -123,7 +144,6 @@ class PlaySerializer(serializers.ModelSerializer):
 
         #! WARNING я додала це на основі save але треба перевірити (сервер неправильно приймав фото)
         self._handle_image(play, image_file, image_url)
-
 
         return play
 
@@ -201,3 +221,26 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError({"error": "WrongData"})
 
         return data
+
+
+class PlayLikeToggleSerializer(serializers.Serializer):
+    liked = serializers.BooleanField(read_only=True)
+
+    def save(self, **kwargs):
+        user = self.context["request"].user
+        play_id = self.context["view"].kwargs["pk"]
+
+        liked = Repository().plays.toggle_like(user, play_id)
+        return {"liked": liked}
+
+class PlayRatingSerializer(serializers.Serializer):
+    rating = serializers.IntegerField(min_value=1, max_value=5)
+
+    def save(self, **kwargs):
+        user = self.context["request"].user
+        play_id = self.context["play_id"]
+        rating_value = self.validated_data["rating"]
+
+        obj, created = Repository().plays.save_user_rating(user, play_id, rating_value)
+        return {"rating": obj.rating, "play_id": play_id}
+

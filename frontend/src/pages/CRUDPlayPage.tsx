@@ -21,7 +21,8 @@ import DeleteActionButton from "../components/CRUDPlayPage/DeleteActionButton";
 import UndoActionButton from "../components/CRUDPlayPage/UndoActionButton";
 import ImageBgContainer from "../components/CRUDPlayPage/ImageBgContainer";
 import HelperMessage from "../components/CRUDPlayPage/HelperMessage";
-import SaveActionButton from "../components/CRUDPlayPage/SaveActionButton";
+import LikeActionButton from "../components/CRUDPlayPage/LikeActionButton";
+import RatingStars from "../components/CRUDPlayPage/RatingStars";
 
 
 type CRUDPageActionsT = "delete" | "undo" | "save"
@@ -75,7 +76,7 @@ const CRUDPlayPage: React.FC<CRUDPageProps> = ({
 
             <FloatingContainer style={{ left: undefined, right: 24, top: 12, }} >
               <UploadImage />
-              {actions?.includes("save") && <SaveActionButton />}
+              {actions?.includes("save") && <LikeActionButton />}
               {actions?.includes("undo") && <UndoActionButton />}
               {actions?.includes("delete") && <DeleteActionButton />}
             </FloatingContainer>
@@ -91,6 +92,7 @@ const CRUDPlayPage: React.FC<CRUDPageProps> = ({
                 <DirectosField />
               </div>
               <DescriptionField />
+              <RatingStars />
               <ActionButton active={changed && !valid} onClick={saveBtn.action} text={saveBtn.text} />
             </Space>
           </Container>

@@ -53,8 +53,8 @@ const LoginPage: React.FC = () => {
     const scope = useRef<Scope>(null)
     const refScope = useRef<HTMLDivElement>(null)
     const containerRef = useRef<HTMLDivElement>(null);
-    const [helpMsg, setHelpMsg] = useState<string>("Спробуй ввести пошту та пороль) ✨ 🔑")
-    const successMsg = "Молодчинка🌸 спробуй увійти"
+    const [helpMsg, setHelpMsg] = useState<string>("Спробуй ввести пошту та пороль)")
+    const successMsg = "Непогано, спробуй увійти"
 
     useEffect(() => {
         const email = validateEmail(data.email)
@@ -77,10 +77,10 @@ const LoginPage: React.FC = () => {
                 const success = (r: { access: string }) => {
                     setToken(r.access)
 
-                    messageApi.success("succesfully saved!", 1).then(() => navigate("/"));
+                    messageApi.success("Succes!", 1).then(() => navigate("/"));
                 }
 
-                r ? success(r as { access: string }) : messageApi.error("error ocurred", 0.5).then(() => setloading(false))
+                r ? success(r as { access: string }) : messageApi.error("Error ocurred", 0.5).then(() => setloading(false))
             })
         }
 
@@ -132,7 +132,7 @@ const LoginPage: React.FC = () => {
                                 }}
                             />
                         </div>
-                        <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -30, bottom: 50, padding: 16, minWidth: 130, rotate: "10deg" } }}>
+                        <Container template="inner" containerSize="compact" props={{ style: { position: "absolute", backgroundColor: colors.arrow, left: -30, bottom: 50, padding: 16, minWidth: 130, rotate: "0deg" } }}>
                             <Typography style={{ color: colors.primary }} children={helpMsg} />
                         </Container>
                     </div>

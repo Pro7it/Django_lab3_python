@@ -28,7 +28,8 @@ export interface Play {
   description: string;
   author: string;
   genre: number | Genre | null;
-  saved: boolean
+  user_liked: boolean,
+  user_rating: number,
 }
 
 export interface UserLogin {
@@ -46,7 +47,8 @@ export const EmptyPlay: Play = {
   duration: 0,
   genre: null,
   play_id: 0,
-  saved: false,
+  user_liked: false,
+  user_rating: 0,
 }
 
 export const checkInvalid = <T extends keyof Play>(field: T, v: Play[T]) => v == EmptyPlay[field]
