@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { ResponsiveContainer, Treemap } from "recharts";
-import { Varialbles } from "../../../config";
-import { useToken } from "../../../utils/StateManager";
+import { getQuery } from "../../../utils/RestUtils";
 
 function CustomContent(props: any) {
   const { x, y, width, height, name, rating } = props;
@@ -46,23 +45,15 @@ export default function MyTreeMapChart() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${Varialbles.backend}api/plays/stats/2/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${useToken.getState().token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setData(
-          data.map((d: { rating: number }) => ({
-            ...d,
-            size: d.rating * 100,
-          }))
-        );
-      })
-      .finally(() => setLoading(false));
+    getQuery(`api/plays/stats/2/`).then((data) => {
+      setData(
+        (data ?? []).map((d: { rating: number }) => ({
+          ...d,
+          size: d.rating * 100,
+        }))
+      );
+      setLoading(false);
+    });
   }, []);
 
   if (loading) return <div>Loading...</div>;

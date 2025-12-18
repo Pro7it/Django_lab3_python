@@ -10,18 +10,18 @@ import {
 import { useEffect, useState } from "react";
 import { getQuery } from "../../../utils/RestUtils";
 
-type RatingItem = {
+type DataItem = {
   name: string;
   rating: number;
 };
 
 export default function MyBarChart() {
-  const [data, setData] = useState<RatingItem[]>([]);
+  const [data, setData] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getQuery(`api/theaters/stats/rating/2/`).then((data) => {
-      setData((data as RatingItem[]) ?? []);
+      setData((data as DataItem[]) ?? []);
       setLoading(false);
     });
   }, []);

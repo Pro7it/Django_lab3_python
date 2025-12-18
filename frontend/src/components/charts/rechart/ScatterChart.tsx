@@ -8,8 +8,7 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import { Varialbles } from "../../../config";
-import { useToken } from "../../../utils/StateManager";
+import { getQuery } from "../../../utils/RestUtils";
 
 type DataItem = {
   likes_amount: number;
@@ -21,19 +20,11 @@ export default function MyScatterChart() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${Varialbles.backend}api/plays/stats/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${useToken.getState().token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+        getQuery(`api/plays/stats/`).then((data) => {
+          setData((data as DataItem[]) ?? []);
+          setLoading(false);
+        });
+      }, []);
 
   if (loading) return <div>Loading...</div>;
 

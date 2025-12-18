@@ -8,32 +8,23 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Varialbles } from "../../../config";
-import { useToken } from "../../../utils/StateManager";
+import { getQuery } from "../../../utils/RestUtils";
 
-type DateStat = {
+type DataItem = {
   date: string;
   amount: number;
 };
 
 export default function MyLineChart() {
-  const [data, setData] = useState<DateStat[]>([]);
+  const [data, setData] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${Varialbles.backend}api/tickets/stats/by/date/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${useToken.getState().token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+      getQuery(`api/tickets/stats/by/date/`).then((data) => {
+        setData((data as DataItem[]) ?? []);
+        setLoading(false);
+      });
+    }, []);
 
   if (loading) return <div>Loading...</div>;
 

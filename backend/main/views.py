@@ -191,7 +191,8 @@ class ActorViewSet(BaseViewSet):
         return_style = get_return_style(request)
 
         qs = self.repository.stats_by_play()
-        return Response(pd.DataFrame(list(qs)).dropna().to_dict(return_style))
+        df = pd.DataFrame(list(qs)).dropna()
+        return Response(df[["name", "plays_amount"]].to_dict(return_style))
 
 
 class DirectorViewSet(BaseViewSet):
@@ -285,13 +286,13 @@ class TheatreViewSet(BaseViewSet):
         return_style = get_return_style(request)
 
         qs = self.repository.daily_tickets()
-        df = pd.DataFrame.from_records(qs).dropna()
+        df = pd.DataFrame.from_records(qs).dropna().sort_values(by=["name"], ascending=False).head(15)
 
         return Response(df.to_dict(return_style))
 
     #############################################################################################################
     #############################################################################################################
-    ##############################не хвилюйтеся, це тимчасова стіна від мого говнокоду###########################
+    ##############################не хвилюйтеся, це тимчасова стіна від мого тестового коду######################
     #############################################################################################################
     #############################################################################################################
 
