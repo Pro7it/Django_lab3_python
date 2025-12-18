@@ -1,7 +1,5 @@
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-import time
-import numpy as np
 import pandas as pd
+from main.services.db_parallel_test import DBParallelTester
 from main.filter import PlayFilter
 from .repository.Repository import Repository
 from rest_framework import viewsets, status
@@ -13,49 +11,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import *
-from django.db import close_old_connections
 
 return_style = "list"  # or records 
-
-
-
-def analitics_for_theater(data):
-    import pandas as pd
-
-    df = pd.DataFrame(data["tickets"])
-    if df.empty:
-        return {"theatre_id": data["theatre_id"], "empty": True}
-    
-    # for i in range(10000000):
-    #     df["wme"] = df["time"].apply(lambda x: x.hour + i)    
-    
-    df["time"] = df["time"].apply(lambda x: x.hour)    
-    prices = df["price"].astype(float)
-
-    for i in range(10000):
-        df["time"] = df["time"] + i
-        df["time"] = df["time"] - i
-
-    z = (prices - prices.mean()) / prices.std(ddof=0)
-    
-    prices2 = df["price"].astype(float).values
-
-    diff_matrix = np.abs(prices2[:, None] - prices2[None, :])
-    avg_pair_diff = float(diff_matrix.mean())
-    
-
-    return {
-        "theatre_id": data["theatre_id"],
-        "tickets": int(len(df)),
-        "avg_price": float(prices.mean()),
-        "median_price": float(prices.median()),
-        "p90_price": float(prices.quantile(0.9)),
-        "price_cv": float(prices.std() / prices.mean()),  # варіативність
-        "outliers": int((z.abs() > 3).sum()),  # дорогі/дешеві
-        "peak_hour": int(df["time"].value_counts().idxmax()),
-        "avg_pair_diff": avg_pair_diff,
-    }
 
 
 class DefaultPagination(PageNumberPagination):
@@ -274,45 +231,16 @@ class TheatreViewSet(BaseViewSet):
         df["rating"] = df["rating"].round(1)
         return Response(df[["theatre_id", "rating"]].to_dict(return_style))
 
-    def count_tickets_for_theatre(self, theatre_id):
-        close_old_connections()
-        query_set = (
-            Ticket.objects.filter(schedule__hall__theatre_id=theatre_id)
-            .annotate(time=F("schedule__time"))
-            .values("price", "time")
-        )
-        
-        return {"theatre_id": theatre_id, "tickets": list(query_set)}
-
-
-    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TEST ПОКИ ЩО
+    
+    #http://localhost:8000/api/theaters/multithread-test/?threads=18&i=10&ultimate=1
+    #http://localhost:8000/api/theaters/multithread-test/
     @action(detail=False, methods=["get"], url_path="multithread-test")
     def concurrency_test(self, request):
-        # close_old_connections()
-        THREADS = int(request.query_params.get("threads", 1))
+        THREADS = min(int(request.query_params.get("threads", 1)), 50)
+        ITERATIONS = min(int(request.query_params.get("i", 1)), 100_000_000)
+        ULTIMATE = bool(int(request.query_params.get("ultimate", 0)))
 
-        theatre_ids = list(self.repository.get_all().values_list("theatre_id", flat=True))
-
-
-        with ThreadPoolExecutor(max_workers=THREADS) as executor1:
-            data = list(executor1.map(self.count_tickets_for_theatre, theatre_ids))
-            
-        # return Response(data)
-
-        start = time.perf_counter()
-        with ProcessPoolExecutor(max_workers=THREADS) as executor2:
-            analitics = list(executor2.map(analitics_for_theater, data))
-        
-        elapsed = time.perf_counter() - start
-
-        df = pd.DataFrame({"theatre_id": theatre_ids, "tickets_sold": data, "analitics": analitics})
-
-
-        response = {
-            "threads": THREADS,
-            "time": round(elapsed, 4),
-            "data": df.to_dict("records"),
-        }
+        response = DBParallelTester().run(THREADS, ITERATIONS, ULTIMATE)
 
         return Response(response)
 
@@ -340,6 +268,14 @@ class TicketViewSet(BaseViewSet):
         qs = self.repository.stats_by_date()
         df = pd.DataFrame(list(qs)).sort_values(by="date", ascending=True)
         return Response(df.to_dict(return_style))
+    
+    #http://localhost:8000/api/tickets/ultimate-get
+    @action(detail=False, methods=["get"], url_path="ultimate-get")
+    def stats_date(self, _):
+        qs = self.repository.get_all_with_attached_fields()
+        df = pd.DataFrame(list(qs))
+        # return Response("ok")
+        return Response(df.to_dict("records"))
 
 
 class UserViewSet(BaseViewSet):
