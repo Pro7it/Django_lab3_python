@@ -29,7 +29,7 @@ export function MyHistogramChart() {
 
   const layout: Partial<Plotly.Layout> = {
     ...baseLayout,
-    title: { text: "So, how popular genre is?" },
+    title: { text: "So, how popular each genre is?" },
     xaxis: { title: { text: "Genre" } },
     yaxis: { title: { text: "Occurrences" } },
   };
