@@ -1,14 +1,29 @@
 import Plotly from "plotly.js-dist-min";
 import createPlotlyComponent from "react-plotly.js/factory";
 import { baseLayout, baseProps } from "./BaseLayout";
+import { useState, useEffect } from "react";
+import { getQuery } from "../../../utils/RestUtils";
 
 const Plot = createPlotlyComponent(Plotly);
 
 export function MyHistogramChart() {
+  const [genres, setGenres] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getQuery("api/genres/stats/by/name") 
+      .then((res) => {
+        setGenres(res as string[] ?? []);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+
   const data: Plotly.Data[] = [
     {
       type: "histogram",
-      x: ["Драма", "Комедія", "Драма", "Опера", "Балет", "Комедія"],
+      x: genres,
     },
   ];
 

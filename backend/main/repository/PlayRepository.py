@@ -1,6 +1,8 @@
 from .BaseRepository import BaseRepository
 from main.models import *
 from django.db.models import *
+from django.db.models.functions import ExtractYear
+from django.utils.timezone import now
 
 
 class PlayRepository(BaseRepository):
@@ -50,15 +52,17 @@ class PlayRepository(BaseRepository):
             return True
 
     def stats(self):
-        qs = self.model.objects.values("play_id", "name").annotate(
-            actors_amount=Count("actors__actor_id", distinct=True),
-            likes_amount=Count("liked_by__email", distinct=True),
-            rating=Avg("playrating__rating"),
-            avg_ticket_price=Avg("schedule__ticket__price"),
-            ticked_sold_amount=Count("schedule__ticket__ticket_id", filter=Q(schedule__ticket__status="проданий")),
-            ticked_free_amount=Count("schedule__ticket__ticket_id", filter=Q(schedule__ticket__status="вільний")),
+        qs = (self.model.objects.values("play_id", "name", genre_name=F("genre__name"))
+            .annotate(
+                actors_amount=Count("actors__actor_id", distinct=True),
+                likes_amount=Count("liked_by__email", distinct=True),
+                rating=Avg("playrating__rating"),
+                avg_ticket_price=Avg("schedule__ticket__price"),
+                ticked_sold_amount=Count("schedule__ticket__ticket_id", filter=Q(schedule__ticket__status="проданий")),
+                ticked_free_amount=Count("schedule__ticket__ticket_id", filter=Q(schedule__ticket__status="вільний")),
+                avg_actors_age=Avg(ExtractYear(now()) - ExtractYear("actors__birthdate"))
+            )
         )
-
         return qs
 
     def save_user_rating(self, user, play_id, rating_value):

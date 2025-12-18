@@ -165,6 +165,24 @@ class PlayViewSet(BaseViewSet):
         df = pd.DataFrame(list(qs)).dropna()
         df = df.sort_values(by="rating", ascending=False)
         return Response(df[["name", "rating"]].to_dict(return_style))
+    
+    @action(detail=False, methods=["get"], url_path="stats/3")
+    def stats_3(self, request):
+        return_style = get_return_style(request)
+
+        qs = self.repository.stats()
+        df = pd.DataFrame(list(qs)).dropna().sort_values(by="avg_actors_age")
+        df["avg_actors_age"] = df["avg_actors_age"].round()
+        return Response(df[["genre_name", "avg_actors_age"]].to_dict(return_style))
+    
+    @action(detail=False, methods=["get"], url_path="stats/4")
+    def stats_4(self, request):
+        return_style = get_return_style(request)
+
+        qs = self.repository.stats()
+        df = pd.DataFrame(list(qs)).dropna()
+        df["rating"] = df["rating"].round(1)
+        return Response(df[["name", "rating", "ticked_sold_amount"]].to_dict(return_style))
 
     @action(detail=True, methods=["post"])
     def rate(self, request, pk=None):
@@ -199,7 +217,7 @@ class ActorViewSet(BaseViewSet):
         return_style = get_return_style(request)
 
         qs = self.repository.stats_by_play()
-        df = pd.DataFrame(list(qs)).dropna()
+        df = pd.DataFrame(list(qs)).dropna().sort_values(by="plays_amount", ascending=False).head(10)
         return Response(df[["name", "plays_amount"]].to_dict(return_style))
 
 
@@ -230,11 +248,15 @@ class GenreViewSet(BaseViewSet):
 
     @action(detail=False, methods=["get"], url_path="stats/by/name")
     def stats_genre(self, request):
-        return_style = get_return_style(request)
-
         qs = self.repository.stats()
-        df = pd.DataFrame(list(qs)).fillna(0)
-        return Response(df.to_dict(return_style))
+        return Response(list(qs))
+    
+    @action(detail=False, methods=["get"], url_path="stats/actors") 
+    def stats_actors(self, request): 
+        return_style = get_return_style(request) 
+        qs = self.repository.stats_actor() 
+        df = pd.DataFrame(list(qs)).dropna() 
+        return Response(df[["name", "avg_actors_age"]].to_dict(return_style))
 
 
 class HallViewSet(BaseViewSet):
@@ -377,6 +399,19 @@ class TicketViewSet(BaseViewSet):
         qs = self.repository.stats_by_date()
         df = pd.DataFrame(list(qs)).sort_values(by="date", ascending=True)
         return Response(df[["date", "amount"]].to_dict(return_style))
+    
+    @action(detail=False, methods=["get"], url_path="stats/prices")
+    def stats(self, request):
+        qs = self.repository.stats()
+        return Response(list(qs))
+
+    @action(detail=False, methods=["get"], url_path="stats/by/price")
+    def stats_date(self, request):
+        return_style = get_return_style(request)
+
+        qs = self.repository.sold_by_price()
+        df = pd.DataFrame(list(qs))
+        return Response(df.to_dict(return_style))
 
 
 class UserViewSet(BaseViewSet):

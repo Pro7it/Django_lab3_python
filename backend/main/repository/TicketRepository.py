@@ -26,4 +26,19 @@ class TicketRepository(BaseRepository):
         )
 
         return qs
+    
+    def stats(self):
+        return self.model.objects.values_list("price", flat=True)
+    
+    def sold_by_price(self):
+        return (
+            Ticket.objects.filter(status="проданий")
+            .values(
+                ticket_price=Cast("price", IntegerField())
+            )
+            .annotate(
+                total_sold=Count("ticket_id")
+            )
+            .order_by("ticket_price")
+        )
 
