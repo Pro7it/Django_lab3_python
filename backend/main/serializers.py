@@ -15,7 +15,7 @@ MAX_FILE_SIZE = 5 * 1024 * 1024
 #         # print(line, file=f)
 #         f.close()
 
-
+# 🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦
 class ActorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actor
@@ -40,7 +40,7 @@ class PlaySerializer(serializers.ModelSerializer):
     actors = ActorSerializer(many=True, read_only=True)
     genre = GenreSerializer(read_only=True)
     image_file = serializers.ImageField(required=False, allow_null=True)
-    image_url = serializers.CharField(required=False, allow_blank=True, write_only=True)
+    image_url = serializers.CharField(required=False, allow_blank=True)
 
     director_ids = serializers.PrimaryKeyRelatedField(many=True, queryset=Director.objects.all(), write_only=True)
     actor_ids = serializers.PrimaryKeyRelatedField(many=True, queryset=Actor.objects.all(), write_only=True)

@@ -8,7 +8,7 @@ const ImageBgContainer: React.FC<PropsWithChildren<{ refScope?: React.Ref<HTMLDi
 
     const bgUrl = image ? (image instanceof File
         ? URL.createObjectURL(image)
-        : `http://localhost:8000/${image}`) : null
+        : image) : null
 
     return <Container
         renderItem="div"
