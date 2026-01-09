@@ -21,14 +21,6 @@ const MultithreadPage: React.FC = () => {
     const [logged, setLogged] = useState<boolean>(false)
     const [messageApi, contextHolder] = message.useMessage();
 
-
-    // const handleLogChart = () => {
-    //     const data = chartData
-    //     setChartData(logData)
-    //     setLogData(data)
-    // }
-
-
     const handleTest = () => {
         const controller = new AbortController();
         controllerRef.current = controller;
@@ -139,16 +131,6 @@ const MultithreadPage: React.FC = () => {
                             data={logged ? logData : chartData}
                             margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
                         >
-                            {/* <defs>
-                                <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                                </linearGradient>
-                                <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-                                    <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-                                </linearGradient>
-                            </defs> */}
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="threads" />
                             <YAxis dataKey={"time"} width="auto" />
@@ -160,16 +142,6 @@ const MultithreadPage: React.FC = () => {
                                 stroke={colors.accent + "aa"}
                                 fill={colors.accent + "77"}
                             />
-                            {/* {chartData.map((el: {threads: number, time: number}, idx) => (
-                                <Area
-                                    key={idx}
-                                    type="monotone"
-                                    dataKey={el.threads}
-                                    stroke={areaColors[idx]}
-                                    fill={areaColors[idx]}
-                                    activeDot={{ r: 8 }}
-                                />
-                            ))} */}
                         </AreaChart>}
 
                         <Space style={{ width: "100%", justifyContent: "center" }}>

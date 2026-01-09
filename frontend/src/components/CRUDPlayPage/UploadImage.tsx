@@ -2,15 +2,38 @@ import { Button, Popover, Space, Tooltip, Typography } from "antd";
 import { colors } from "../../config";
 import { FloatingButton } from "../FloatingButton";
 import { FileImageFilled } from "@ant-design/icons";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePlayState } from "../../utils/StateManager";
 
 
 const UploadImage = () => {
     const [open, setOpen] = useState<boolean>(false)
     const changeField = usePlayState(s => s.changeFiled)
+    const setChanged = usePlayState(s => s.setChanged)
+    const lastSaved = usePlayState(s => s.savedData?.image)
+    const valid = usePlayState(_ => _.valid)
+    const isvalid = usePlayState(_ => _.isValid)
+    const changed = usePlayState(_ => _.isChanged)
+
+
     const uploadRef = useRef<HTMLInputElement>(null)
     const image = usePlayState(s => s.data?.image)
+
+    const handleRemoveImage = () => {
+        changeField("image", null)
+        setChanged("image", lastSaved != null)
+    }
+
+    const handleUploadImage = (file?: File) => {
+        changeField("image", file ?? null)
+        setChanged("image", true)
+        
+    }
+    
+    useEffect(()=>{
+        
+        console.log(image, valid, changed, isvalid);
+    }, [image])
 
     return <Popover
         open={open}
@@ -20,7 +43,7 @@ const UploadImage = () => {
         content={<Space direction="vertical" size={0}>
             {image ? <Button
                 className="btn-hover"
-                onClick={() => changeField("image", null)}
+                onClick={handleRemoveImage}
                 style={{ backgroundColor: colors.primary }}
                 variant="filled"
                 type="link"
@@ -47,7 +70,7 @@ const UploadImage = () => {
                         accept="image/*"
                         onChange={(e) => {
                             const file = e.target.files?.[0];
-                            changeField("image", file ?? null)
+                            handleUploadImage(file)
                         }}
                         style={{ display: "none", position: "absolute", zIndex: -100 }}
                         ref={uploadRef}

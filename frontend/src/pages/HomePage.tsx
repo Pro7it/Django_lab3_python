@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
       </Button>
 
       <Button
-        onClick={() => navigate("/v1")}
+        onClick={() => navigate("/recharts")}
         variant="filled"
         shape="round"
         color="pink"
@@ -57,7 +57,7 @@ const HomePage: React.FC = () => {
         recharts
       </Button>
       <Button
-        onClick={() => navigate("/v2")}
+        onClick={() => navigate("/plotly")}
         variant="filled"
         shape="round"
         color="pink"
@@ -66,7 +66,7 @@ const HomePage: React.FC = () => {
         plotly
       </Button>
       <Button
-        onClick={() => navigate("/ihatepython")}
+        onClick={() => navigate("/multithread")}
         variant="filled"
         shape="round"
         color="pink"

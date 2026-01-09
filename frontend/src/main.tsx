@@ -39,15 +39,15 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: "/v1",
+    path: "/recharts",
     element: <RechartsPage />,
   },
   {
-    path: "/v2",
+    path: "/plotly",
     element: <PlotlyPage />,
   },
   {
-    path: "/ihatepython",
+    path: "/multithread",
     element: <MultiThread />
   }
 ]);
@@ -86,7 +86,7 @@ const AntdTheme: ThemeConfig = {
       activeBorderColor: colors.accent,
       hoverBorderColor: colors.accent,
     },
-    
+    // 🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦
     InputNumber: {
       activeBorderColor: colors.accent,
       handleHoverColor: colors.accent,

@@ -17,7 +17,7 @@ export default function MyRadarChart() {
 
 
   useEffect(() => {
-    getQuery<RatingsResponse>(`api/plays/stats/ratings/?return_type=list`)
+    getQuery<RatingsResponse>(`api/plays/stats/for/rating/alternative/?return_type=list`)
       .then((res) => {
         if (!res) return;
 

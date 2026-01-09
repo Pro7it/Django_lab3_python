@@ -21,7 +21,7 @@ export default function MyScatterChart() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getQuery(`api/plays/stats/`).then((data) => {
+    getQuery(`api/plays/stats/for/likes_amount`).then((data) => {
       setData((data as DataItem[]) ?? []);
       setLoading(false);
     });
