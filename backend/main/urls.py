@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path('login/', views.MyTokenObtainPairView.as_view()),
     path('login/refresh/', TokenRefreshView.as_view()),
+    path("celery-work/", views.run_test_task),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
