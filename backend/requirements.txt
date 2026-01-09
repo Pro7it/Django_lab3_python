@@ -9,3 +9,7 @@ pillow
 legacy-cgi
 django-filter
 pandas
+celery>=5.3
+django-celery-results
+kombu
+# 🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦🥦
