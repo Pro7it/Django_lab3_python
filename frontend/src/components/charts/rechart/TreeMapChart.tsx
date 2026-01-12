@@ -3,7 +3,8 @@ import { ResponsiveContainer, Treemap } from "recharts";
 import { getQuery } from "../../../utils/RestUtils";
 
 function CustomContent(props: any) {
-  const { x, y, width, height, name, rating } = props;
+  const { x, y, width, height, name, value } = props;
+  const rating = value ?? 0;
 
   if (width < 80 || height < 40) return null;
 
@@ -28,7 +29,7 @@ function CustomContent(props: any) {
         strokeOpacity={0}
         fontSize={12}
       >
-        ⭐ {rating}
+        ⭐ {rating.toFixed(2)}
       </text>
     </g>
   );
