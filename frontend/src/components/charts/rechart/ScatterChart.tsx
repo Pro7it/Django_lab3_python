@@ -8,6 +8,8 @@ import {
   YAxis,
   Tooltip,
   Label,
+  LineChart,
+  Line,
 } from "recharts";
 import { getQuery } from "../../../utils/RestUtils";
 
@@ -34,14 +36,18 @@ export default function MyScatterChart() {
       <ResponsiveContainer>
         <ScatterChart>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="likes_amount">
+          <XAxis
+            type="number"
+            dataKey="likes_amount"
+            // domain={["dataMin", "dataMax"]}
+          >
             <Label
               value="Кількість лайків"
               position="insideBottom"
               offset={-5}
             />
           </XAxis>
-          <YAxis dataKey="rating">
+          <YAxis dataKey="rating" type="number" domain={[0, 5]}>
             <Label
               value="Рейтинг"
               angle={-90}
@@ -52,6 +58,13 @@ export default function MyScatterChart() {
           <Tooltip cursor={{ strokeDasharray: "3 3" }} />
           <Scatter data={data} fill="#8884d8" />
         </ScatterChart>
+        {/* <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="likesRange" />
+          <YAxis />
+          <Tooltip />
+          <Line type="monotone" dataKey="avgRating" stroke="#8884d8" />
+        </LineChart> */}
       </ResponsiveContainer>
     </div>
   );
