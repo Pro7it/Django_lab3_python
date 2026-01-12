@@ -73,7 +73,7 @@ const playKeys = Object.keys(EmptyPlay)
 export const usePlayState = create<PlayStateT>((set, get) => ({
     data: undefined,
     savedData: undefined,
-    isValid: true,
+    isValid: false, //? я не знаю чому але я зробив щоб коли воно false то це типу жодних проблем усе ок....
     isChanged: false,
     valid: 0,
     changed: 0,
@@ -88,12 +88,12 @@ export const usePlayState = create<PlayStateT>((set, get) => ({
         })
     },
     init: (p) => {
-        set({ data: p, savedData: p, valid: 0, changed: 0, isValid: !checkAllFilled(p, EmptyPlay, ["play_id", "image", "directors", "actors"]), isChanged: false })
+        set({ data: p, savedData: p, valid: 0, changed: 0, isValid: !checkAllFilled(p, EmptyPlay, ["play_id", "image", "directors", "actors", "user_rating", "user_liked"]), isChanged: false })
 
     },
     undo: () => {
         const saved = get().savedData;
-        set({ data: saved, changed: 0, isChanged: false, isValid: !checkAllFilled(saved ?? EmptyPlay, EmptyPlay, ["play_id", "image", "directors", "actors"]), valid: 0 });
+        set({ data: saved, changed: 0, isChanged: false, isValid: !checkAllFilled(saved ?? EmptyPlay, EmptyPlay, ["play_id", "image", "directors", "actors", "user_rating", "user_liked"]), valid: 0 });
     },
     save: () => set({ savedData: get().data, changed: 0, isChanged: false }),
     setValid: (field, v) => {

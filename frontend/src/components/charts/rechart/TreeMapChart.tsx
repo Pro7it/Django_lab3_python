@@ -45,7 +45,7 @@ export default function MyTreeMapChart() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getQuery(`api/plays/stats/2/`).then((data: any) => {
+    getQuery(`api/plays/stats/for/rating/`).then((data: any) => {
       setData(
         (data ?? []).map((d: { rating: number }) => ({
           ...d,

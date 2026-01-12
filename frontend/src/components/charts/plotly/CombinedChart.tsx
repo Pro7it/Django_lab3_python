@@ -17,7 +17,7 @@ export function MyCombinedChart() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getQuery<DataItem>("/api/plays/stats/4/?return_type=list")
+    getQuery<DataItem>("/api/plays/stats/for/ticked_sold_amount/?return_type=list")
       .then(res => {
         setData([
           {

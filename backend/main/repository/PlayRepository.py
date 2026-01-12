@@ -51,7 +51,7 @@ class PlayRepository(BaseRepository):
             user.liked_plays.add(play)
             return True
 
-    def stats(self):
+    def stats_default(self):
         qs = (self.model.objects.values("play_id", "name", genre_name=F("genre__name"))
             .annotate(
                 actors_amount=Count("actors__actor_id", distinct=True),
@@ -65,7 +65,7 @@ class PlayRepository(BaseRepository):
         )
         return qs
     
-    def stats3(self):
+    def stats_for_avg_actors_age(self):
         qs = (self.model.objects.values("play_id", "name", genre_name=F("genre__name"))
             .annotate(
                 avg_actors_age=Avg(ExtractYear(now()) - ExtractYear("actors__birthdate"))

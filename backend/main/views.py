@@ -1,4 +1,6 @@
+from django.http import JsonResponse
 import pandas as pd
+from main.tasks import test_task
 from main.services.db_parallel_test import DBParallelTester
 from main.filter import PlayFilter
 from .repository.Repository import Repository
@@ -114,38 +116,38 @@ class PlayViewSet(BaseViewSet):
 
         return Response(result, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=["get"], url_path="stats")
-    def stats_1(self, request):
+    @action(detail=False, methods=["get"], url_path="stats/for/likes_amount")
+    def stats_for_likes_amount(self, request):
         return_style = get_return_style(request)
 
-        qs = self.repository.stats()
+        qs = self.repository.stats_default()
         df = pd.DataFrame(list(qs)).dropna()
         df = df.sort_values(by="likes_amount", ascending=False)
         return Response(df[["likes_amount", "rating"]].to_dict(return_style))
 
-    @action(detail=False, methods=["get"], url_path="stats/2")
-    def stats_2(self, request):
+    @action(detail=False, methods=["get"], url_path="stats/for/rating")
+    def stats_for_rating(self, request):
         return_style = get_return_style(request)
 
-        qs = self.repository.stats()
+        qs = self.repository.stats_default()
         df = pd.DataFrame(list(qs)).dropna()
         df = df.sort_values(by="rating", ascending=False)
         return Response(df[["name", "rating"]].to_dict(return_style))
     
-    @action(detail=False, methods=["get"], url_path="stats/3")
-    def stats_3(self, request):
+    @action(detail=False, methods=["get"], url_path="stats/for/avg_actors_age")
+    def stats_for_avg_actors_age(self, request):
         return_style = get_return_style(request)
 
-        qs = self.repository.stats3()
+        qs = self.repository.stats_for_avg_actors_age()
         df = pd.DataFrame(list(qs)).dropna().sort_values(by="avg_actors_age")
         df["avg_actors_age"] = df["avg_actors_age"].round()
         return Response(df[["genre_name", "avg_actors_age"]].to_dict(return_style))
     
-    @action(detail=False, methods=["get"], url_path="stats/4")
-    def stats_4(self, request):
+    @action(detail=False, methods=["get"], url_path="stats/for/ticked_sold_amount")
+    def stats_for_ticked_sold_amount(self, request):
         return_style = get_return_style(request)
 
-        qs = self.repository.stats()
+        qs = self.repository.stats_default()
         df = pd.DataFrame(list(qs)).dropna()
         df["rating"] = df["rating"].round(1)
         return Response(df[["name", "rating", "ticked_sold_amount"]].to_dict(return_style))
@@ -157,8 +159,8 @@ class PlayViewSet(BaseViewSet):
         result = serializer.save()
         return Response(result, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=["get"], url_path="stats/ratings")
-    def stats_actors(self, request):
+    @action(detail=False, methods=["get"], url_path="stats/for/rating/alternative")
+    def stats_for_rating_alternative(self, request):
         return_style = get_return_style(request)
         qs = self.repository.stats_plays_rating()
         df = pd.DataFrame(list(qs)).dropna().sort_values(by="rating", ascending=True)
@@ -403,3 +405,11 @@ class UserViewSet(BaseViewSet):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+
+def run_test_task(request):
+    task = test_task.delay(3, 4)
+    return JsonResponse({
+        "status": "sent",
+        "task_id": task.id
+    })

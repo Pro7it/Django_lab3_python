@@ -38,17 +38,17 @@ export interface UserLogin {
 }
 
 export const EmptyPlay: Play = {
-  image: null,
+  image: null, //!
   name: "",
-  actors: [],
-  directors: [],
+  actors: [], //!
+  directors: [], //!
   author: "",
   description: "",
   duration: 0,
   genre: null,
-  play_id: 0,
-  user_liked: false,
-  user_rating: 0,
+  play_id: 0, //!
+  user_liked: false, //!
+  user_rating: 0, //!
 }
 
 export const checkInvalid = <T extends keyof Play>(field: T, v: Play[T]) => v == EmptyPlay[field]

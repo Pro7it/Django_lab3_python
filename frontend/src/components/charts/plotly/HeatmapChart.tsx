@@ -54,7 +54,7 @@ export function MyHeatmapChart() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getQuery<BackendItem[]>("/api/plays/stats/3")
+    getQuery<BackendItem[]>("/api/plays/stats/for/avg_actors_age")
       .then(res => {
         const heatmap = transformToHeatmap(res ?? []);
 

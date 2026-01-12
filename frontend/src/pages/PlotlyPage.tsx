@@ -23,7 +23,7 @@ const PlotlyPage: React.FC = () => {
         />
       </FloatingContainer>
       <ChartDiv template="screen">
-        <Typography.Title level={1}>Some cool statistic2</Typography.Title>
+        <Typography.Title level={1}>Some cool statistic🥦</Typography.Title>
         <ChartDiv template="chart">
           <MyRadarChart />
         </ChartDiv>
